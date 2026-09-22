@@ -249,7 +249,8 @@ function Select({ label, value, onChange, options }) {
   return (
     <div style={{ marginBottom: 10 }}>
       <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: 4 }}>{label}</label>
-      <select value={value ?? ""} onChange={(e) => onChange(Number(e.target.value) || e.target.value)}
+      <select value={value ?? ""} aria-label={label}
+        onChange={(e) => onChange(Number(e.target.value) || e.target.value)}
         style={{ width: "100%", background: "var(--void)", border: "1px solid var(--line)",
                  borderRadius: 6, color: "var(--text)", padding: "7px 8px", fontSize: "0.82rem" }}>
         {options.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
