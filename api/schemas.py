@@ -20,6 +20,21 @@ class DriverPrediction(BaseModel):
     dnf_prob: float | None = None
 
 
+class StrategyMeter(BaseModel):
+    """Circuit strategy-disruption meter shown ALONGSIDE the prediction (never
+    fed into the model). `label` is decided by held-out validation: "Strategy
+    complexity" (a description, no confidence claim) unless the meter was shown
+    to track prediction error out-of-sample, in which case it becomes "Prediction
+    confidence (strategy-based)". `state` is "no_history" for new venues."""
+    label: str
+    is_confidence: bool
+    state: str            # "ok" or "no_history"
+    level: str | None = None   # Low / Medium / High, or null
+    score: float | None = None
+    reason: str
+    components_used: list[str] = []
+
+
 class PredictionResponse(BaseModel):
     season: int
     round: int
@@ -28,6 +43,7 @@ class PredictionResponse(BaseModel):
     rain_prob: float
     is_real_data: bool
     predictions: list[DriverPrediction]
+    strategy_meter: StrategyMeter | None = None
 
 
 class StrategyRequest(BaseModel):

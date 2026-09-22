@@ -110,6 +110,35 @@ form_avg_finish          0.585508
 round_norm               0.581058
 ```
 
+## Circuit strategy meter (item 2)
+
+A race-level meter describes how much tyre strategy tends to disrupt the order at
+a circuit, built ONLY from prior races at that circuit: grid-to-finish
+divergence (results), pit-stop-count spread between drivers and safety-car
+frequency (lap data, where present). It never uses the fitted degradation curves,
+is never fed into the model, and reports a "no history" state for new venues. It
+is leakage-checked (reversing a race's own result does not move its meter).
+
+Buckets (Low/Medium/High) were designed on 2023-2024 only (tertiles, frozen),
+then tested on held-out 2025 against the hypothesis that high-disruption races
+have WORSE prediction error. The relationship did NOT hold; if anything it was
+inverted. Per-bucket walk-forward error:
+
+| period | bucket | races | mean Spearman | mean MAE |
+|---|---|---|---|---|
+| held-out 2025 | Low | 8 | 0.5400 | 4.3688 |
+| held-out 2025 | Medium | 9 | 0.6446 | 3.5708 |
+| held-out 2025 | High | 7 | 0.6711 | 3.7000 |
+| 2026 walk-forward | Low | 6 | 0.5178 | 4.7879 |
+| 2026 walk-forward | Medium | 6 | 0.7665 | 2.8485 |
+| 2026 walk-forward | High | 1 | 0.5783 | 4.3636 |
+
+High-disruption races were predicted as well or better than low-disruption ones,
+so the meter did NOT earn a confidence claim. It is therefore labelled "Strategy
+complexity" (a description of the circuit) everywhere, with no confidence wording
+in the UI, API, or README. See `f1grid/model/strategy_validate.py` and
+`artifacts/eval/strategy_meter.json`.
+
 ## Known limitations (stated, not hidden)
 - No telemetry/weather features yet beyond the manual rain scenario input.
 - Tyre-degradation curves HAVE now been fitted from real FastF1 stint laps (see the tyre-degradation-fit section), but the fitted per-compound ordering is unreliable (fuel/tyre-life identification limit) and did not beat the labelled defaults on held-out strategy validation, so the simulator keeps the labelled defaults; the fit is persisted as a diagnostic. The cliff is censored and kept as a labelled default. Lap coverage for the fit is 2019-2021 (a FastF1 500-calls/hour rate limit stopped extension to later seasons this round).

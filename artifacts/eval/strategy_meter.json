@@ -1,0 +1,78 @@
+{
+  "buckets": {
+    "design_2023_2024": {
+      "High": {
+        "mean_mae": 3.86,
+        "mean_spearman": 0.6379,
+        "n": 15
+      },
+      "Low": {
+        "mean_mae": 4.1889,
+        "mean_spearman": 0.5837,
+        "n": 15
+      },
+      "Medium": {
+        "mean_mae": 3.43,
+        "mean_spearman": 0.7089,
+        "n": 15
+      }
+    },
+    "held_out_2025": {
+      "High": {
+        "mean_mae": 3.7,
+        "mean_spearman": 0.6711,
+        "n": 7
+      },
+      "Low": {
+        "mean_mae": 4.3688,
+        "mean_spearman": 0.54,
+        "n": 8
+      },
+      "Medium": {
+        "mean_mae": 3.5708,
+        "mean_spearman": 0.6446,
+        "n": 9
+      }
+    },
+    "walk_forward_2026": {
+      "High": {
+        "mean_mae": 4.3636,
+        "mean_spearman": 0.5783,
+        "n": 1
+      },
+      "Low": {
+        "mean_mae": 4.7879,
+        "mean_spearman": 0.5178,
+        "n": 6
+      },
+      "Medium": {
+        "mean_mae": 2.8485,
+        "mean_spearman": 0.7665,
+        "n": 6
+      }
+    }
+  },
+  "decided_by": "held-out 2025 walk-forward",
+  "held": false,
+  "hypothesis": "high-disruption races have worse error (lower Spearman AND higher MAE) than low-disruption races",
+  "label_mode": "complexity",
+  "n_design_races": 45,
+  "no_history_races": [
+    {
+      "event": "Las Vegas Grand Prix",
+      "round": 21,
+      "season": 2023
+    },
+    {
+      "event": "Barcelona Grand Prix",
+      "round": 7,
+      "season": 2026
+    }
+  ],
+  "signal_scales": {
+    "divergence": 6.0,
+    "pit_spread": 1.0
+  },
+  "t1": 0.5030676863384349,
+  "t2": 0.7415237100128055
+}

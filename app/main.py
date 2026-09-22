@@ -21,10 +21,11 @@ sys.path.insert(0, str(ROOT))
 from app.theme import THEME_CSS  # noqa: E402
 from app.data_loader import (  # noqa: E402
     load_results_cached, build_features_cached, load_or_train_pipeline,
-    load_model_card_text, build_scenario, available_races,
+    load_model_card_text, build_scenario, available_races, load_laps_cached,
 )
 from f1grid import schema as S  # noqa: E402
 from f1grid.config import CONFIG  # noqa: E402
+from f1grid.model import strategy_meter as _meter  # noqa: E402
 from f1grid.model.montecarlo import monte_carlo_outcomes  # noqa: E402
 from f1grid.model.strategy_sim import compare_strategies, StintPlan  # noqa: E402
 from f1grid.model.tyres import DEFAULT_COMPOUNDS  # noqa: E402
@@ -121,6 +122,27 @@ with tabs[0]:
                     f"</div>"
                 )
             st.markdown("".join(cards), unsafe_allow_html=True)
+
+            # ── Strategy meter (item 2): a circuit descriptor shown ALONGSIDE
+            # the prediction, never fed into it. Held-out validation did not
+            # support a confidence claim, so it is labelled "Strategy complexity".
+            if is_real:
+                m = _meter.classify_from_artifact(results, load_laps_cached(),
+                                                  event, season, rnd)
+                if m["state"] == "no_history":
+                    badge = "NO HISTORY"
+                    detail = m["reason"]
+                else:
+                    badge = f"{m['label'].upper()}: {m['level']}"
+                    detail = m["reason"]
+                # Descriptive only: no confidence wording anywhere unless the
+                # validated label_mode earned it.
+                st.markdown(
+                    f"<div class='section-eyebrow' style='margin-top:14px;'>"
+                    f"{badge}</div>"
+                    f"<div style='opacity:0.8;font-size:0.85rem;'>{detail}</div>",
+                    unsafe_allow_html=True,
+                )
 
         st.markdown("<br>", unsafe_allow_html=True)
         c1, c2, c3, c4 = st.columns(4)

@@ -157,6 +157,12 @@ class _FakeState:
         self.used_saved_models = False
         self.is_real_data = False
 
+    def strategy_meter(self, season, round_no, event):
+        # Mirrors AppState.strategy_meter; synthetic state has no real history.
+        return {"label": "Strategy complexity", "is_confidence": False,
+                "state": "no_history", "level": None, "score": None,
+                "reason": "synthetic", "signals": {}, "components_used": []}
+
 
 def test_api_publish_refuses_finished_race(monkeypatch):
     from api import main as api_main

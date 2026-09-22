@@ -5,6 +5,7 @@ import TrackMap from "./components/TrackMap";
 import StrategyGantt from "./components/StrategyGantt";
 import GridBuilder from "./components/GridBuilder";
 import GridComparison from "./components/GridComparison";
+import StrategyMeter from "./components/StrategyMeter";
 
 const NAV = [
   { id: "race", label: "Race Prediction" },
@@ -136,6 +137,7 @@ function RaceView() {
       <div>
         {prediction ? (
           <>
+            <StrategyMeter meter={prediction.strategy_meter} />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
               <TimingTower
                 predictions={prediction.predictions}

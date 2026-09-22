@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from f1grid import schema as S  # noqa: E402
-from f1grid.config import CONFIG, MODEL_DIR, EVAL_DIR  # noqa: E402
+from f1grid.config import CONFIG, MODEL_DIR, EVAL_DIR, DATA_DIR  # noqa: E402
 from f1grid.features.build import build_features  # noqa: E402
 from f1grid.model.quali_model import QualiModel  # noqa: E402
 from f1grid.model.order_model import OrderModel  # noqa: E402
@@ -57,6 +57,19 @@ def load_or_train_pipeline(_results_token: int, feats: pd.DataFrame,
     train_feats = feats[~feats[S.SEASON].isin(eval_seasons)]
     pipe.fit(train_feats)
     return pipe, False
+
+
+@st.cache_data(show_spinner=False)
+def load_laps_cached() -> pd.DataFrame | None:
+    """Lap data is a large, gitignored cache; absent in a fresh clone/deploy.
+    Returns None when missing (the strategy meter degrades gracefully)."""
+    path = DATA_DIR / "laps.parquet"
+    if not path.exists():
+        return None
+    try:
+        return pd.read_parquet(path)
+    except Exception:
+        return None
 
 
 @st.cache_data(show_spinner=False)

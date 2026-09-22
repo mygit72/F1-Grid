@@ -33,6 +33,8 @@ from f1grid.model.montecarlo import monte_carlo_outcomes
 from f1grid.store import schedule as sched
 from f1grid.store.predictions import save_prediction, RetroactivePredictionError, load_predictions
 from f1grid.score.scorer import score_race, track_record
+from f1grid.model import strategy_meter as _meter
+from f1grid.config import DATA_DIR
 
 
 def _latest_completed_key(results: pd.DataFrame) -> tuple[int, int]:
@@ -97,6 +99,15 @@ def publish_next(season: int = 2026, rain_prob: float = 0.0,
     ).sort_values("predicted_position")
 
     l_season, l_round = _latest_completed_key(results)
+
+    # Item 2: attach the validated circuit strategy meter (shown alongside the
+    # prediction, never fed into the model). Laps are optional; the meter
+    # degrades to the results-only signal when they are absent.
+    laps_path = DATA_DIR / "laps.parquet"
+    laps = pd.read_parquet(laps_path) if laps_path.exists() else None
+    meter = _meter.classify_from_artifact(
+        results, laps, upcoming["event"], upcoming["season"], upcoming["round"])
+
     try:
         path = save_prediction(
             upcoming["season"], upcoming["round"], upcoming["event"], merged,
@@ -104,6 +115,7 @@ def publish_next(season: int = 2026, rain_prob: float = 0.0,
             backtest=backtest,
             model_meta={"backend": pipe.race.backend, "trained_races": int(train_feats['race_id'].nunique())},
             now_utc=now_utc,
+            strategy_meter=meter,
         )
     except RetroactivePredictionError as e:
         print(f"REFUSED: {e}")

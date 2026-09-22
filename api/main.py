@@ -23,6 +23,7 @@ from api.state import get_state
 from api.schemas import (
     RaceInfo, PredictionResponse, DriverPrediction,
     StrategyRequest, StrategyResult, TrackRecordRow, ScenarioOverride,
+    StrategyMeter,
 )
 
 app = FastAPI(
@@ -105,9 +106,16 @@ def get_prediction(
         )
         for _, r in merged.iterrows()
     ]
+    meter = state.strategy_meter(season, round_no, event)
     return PredictionResponse(
         season=season, round=round_no, event=event, used_real_grid=use_real_grid,
         rain_prob=rain_prob, is_real_data=state.is_real_data, predictions=preds,
+        strategy_meter=StrategyMeter(
+            label=meter["label"], is_confidence=meter["is_confidence"],
+            state=meter["state"], level=meter.get("level"),
+            score=meter.get("score"), reason=meter["reason"],
+            components_used=meter.get("components_used", []),
+        ),
     )
 
 
@@ -142,6 +150,7 @@ def publish_prediction(
         on=S.DRIVER,
     )
     event = race_feats[S.EVENT].iloc[0]
+    meter = state.strategy_meter(season, round_no, event)
     try:
         path = save_prediction(
             season, round_no, event, merged,
@@ -149,6 +158,7 @@ def publish_prediction(
             backtest=backtest,
             model_meta={"backend": state.pipeline.race.backend,
                        "used_saved_models": state.used_saved_models},
+            strategy_meter=meter,
         )
     except RetroactivePredictionError as e:
         raise HTTPException(409, str(e))

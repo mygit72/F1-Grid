@@ -62,6 +62,7 @@ def save_prediction(
     now_utc: datetime | None = None,
     schedule_lookup=None,
     quali_lookup=None,
+    strategy_meter: dict | None = None,
 ) -> Path:
     """Write a prediction record, enforcing the pre-race boundary.
 
@@ -142,6 +143,10 @@ def save_prediction(
         "prediction": order,
         "schema_version": 3,
     }
+    # Item 2: the circuit strategy meter travels WITH the prediction as a new,
+    # optional field. Older files simply lack it; the loader tolerates both.
+    if strategy_meter is not None:
+        record["strategy_meter"] = strategy_meter
 
     payload = json.dumps(record, sort_keys=True, default=str)
     h = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:10]
