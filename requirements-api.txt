@@ -1,0 +1,26 @@
+# Slim runtime for the API Docker image ONLY.
+#
+# The API is inference-only: it reads the committed parquet + serialized models and
+# serves predictions. It does NOT run FastF1 ingestion (fastf1), render Plotly charts
+# (plotly), or use Streamlit, and none of those are on its import path (fastf1 is
+# imported lazily only inside the ingestion functions the API never calls). Excluding
+# them keeps the image small. The full set (requirements.txt) is used for local dev,
+# the test suite, and the Streamlit app.
+#
+# The six model-serialization-sensitive libraries are pinned EXACTLY to the versions
+# the saved models were trained with, identical to requirements.txt, so predictions
+# are bit-identical to the full image.
+xgboost==3.3.0
+scikit-learn==1.9.0
+numpy==2.4.6
+pandas==2.3.3
+joblib==1.5.3
+pyarrow==24.0.0
+
+# Needed by the scorer import (spearman) and kept at a sensible minimum.
+scipy>=1.11
+
+# Web serving.
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6

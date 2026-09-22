@@ -11,8 +11,9 @@ ENV F1GRID_DEPLOYED=1 \
 
 WORKDIR /srv
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Slim runtime deps only (no fastf1/plotly/streamlit): the API is inference-only.
+COPY requirements-api.txt .
+RUN pip install --no-cache-dir -r requirements-api.txt
 
 COPY f1grid/ f1grid/
 COPY api/ api/
