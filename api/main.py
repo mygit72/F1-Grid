@@ -14,7 +14,8 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from f1grid import schema as S
-from f1grid.runtime import is_deployed, DEPLOYED_REFUSAL, cors_allowed_origins
+from f1grid.runtime import (is_deployed, DEPLOYED_REFUSAL, cors_allowed_origins,
+                            cors_allowed_origin_regex)
 from f1grid.model.montecarlo import monte_carlo_outcomes
 from f1grid.model.strategy_sim import compare_strategies, StintPlan
 from f1grid.store.predictions import save_prediction, RetroactivePredictionError
@@ -35,11 +36,14 @@ app = FastAPI(
     ),
     version="0.1.0",
 )
-# Allow only explicitly trusted origins (never a wildcard): the front-end origin
-# set via F1GRID_CORS_ORIGINS on a deployment, plus local-dev defaults.
+# Allow only explicitly trusted origins (never a wildcard): the exact origins in
+# F1GRID_CORS_ORIGINS (front-end + local dev) plus, optionally, a regex in
+# F1GRID_CORS_ORIGIN_REGEX that matches a Vercel project's preview domains. Any
+# origin not matching either is rejected.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_allowed_origins(),
+    allow_origin_regex=cors_allowed_origin_regex(),
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )

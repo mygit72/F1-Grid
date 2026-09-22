@@ -1,0 +1,30 @@
+name: keep-warm
+
+# Ping the Render API's lightest endpoint on a schedule so the free instance does
+# not sleep during likely visitor hours, avoiding the ~60s cold start for a first
+# visitor. The React app keeps its "waking up the server" message as a fallback for
+# requests outside this window. Render free tier sleeps after ~15 min idle, so a
+# 10-minute ping keeps it warm. GitHub cron is UTC and may be delayed a few minutes.
+on:
+  schedule:
+    - cron: "*/10 6-23 * * *"   # every 10 min, 06:00-23:59 UTC
+  workflow_dispatch: {}
+
+# Only one warm-up at a time; a delayed run should not pile up.
+concurrency:
+  group: keep-warm
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the API root (lightest endpoint)
+        run: |
+          URL="https://f1grid-api-ncbj.onrender.com/"
+          # Best-effort: allow up to a cold start on the first hit, then report the
+          # (warm) response time. Never fail the workflow on a transient miss.
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 90 --retry 2 --retry-delay 5 "$URL" || echo "000")
+          t=$(curl -s -o /dev/null -w '%{time_total}' --max-time 30 "$URL" || echo "n/a")
+          echo "keep-warm ping: HTTP ${code} warm_response=${t}s"
+          echo "keep-warm ping: HTTP ${code}, warm response ${t}s" >> "$GITHUB_STEP_SUMMARY"

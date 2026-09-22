@@ -12,6 +12,16 @@ The API and Streamlit app run in deployed mode: read-only endpoints work, and
 publish and score are refused. The API is on a free tier that sleeps after
 inactivity, so the first request after a while is a cold start and can take up to
 about a minute; the web app shows a "waking up the server" message while it wakes.
+A scheduled GitHub Actions workflow (`keep-warm`) pings the API every 10 minutes
+during the day to keep cold starts rare (warm responses are well under a second).
+
+How the live checks were verified: the API endpoints (real data, saved models,
+403 on publish and score, CORS) and the Vercel web app (a headless Playwright load
+confirming real predictions render) are checked automatically in CI and against the
+live URLs. The Streamlit app was verified manually: the model card loads, the race
+prediction shows real drivers, and publishing is disabled. Headless automation of
+the Streamlit Cloud app was impractical because it wraps the app in nested iframes
+with a JavaScript bootstrap that headless Chromium does not execute.
 
 A Formula 1 prediction engine built around one rule: **a feature describing a
 race may only use information available before that race starts.** Every

@@ -49,6 +49,9 @@ _DEFAULT_CORS_ORIGINS = (
 )
 
 
+CORS_REGEX_ENV_VAR = "F1GRID_CORS_ORIGIN_REGEX"
+
+
 def cors_allowed_origins() -> list[str]:
     """The exact list of browser origins allowed to call the API. Read from
     F1GRID_CORS_ORIGINS (comma-separated) if set, else the local-dev defaults.
@@ -59,3 +62,16 @@ def cors_allowed_origins() -> list[str]:
     origins = [o.strip() for o in raw.split(",") if o.strip()]
     origins = [o for o in origins if o != "*"]
     return origins or list(_DEFAULT_CORS_ORIGINS)
+
+
+def cors_allowed_origin_regex() -> str | None:
+    """An optional regex matching whole origins to allow, on top of the exact
+    list. Used to allow a Vercel project's preview domains (which change per
+    deploy) with one rule instead of listing every URL, e.g.
+    ^https://f1grid01(-[a-z0-9-]+)?\\.vercel\\.app$ matches the production domain
+    and any preview under that project but rejects unrelated origins. Read from
+    F1GRID_CORS_ORIGIN_REGEX; a bare "*" or ".*" is rejected (never open to all)."""
+    raw = os.environ.get(CORS_REGEX_ENV_VAR, "").strip()
+    if not raw or raw in {"*", ".*", "^.*$"}:
+        return None
+    return raw

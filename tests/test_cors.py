@@ -32,6 +32,29 @@ def test_all_star_falls_back_to_defaults(monkeypatch):
     assert origins == list(runtime._DEFAULT_CORS_ORIGINS)
 
 
+def test_origin_regex_env_and_open_rejected(monkeypatch):
+    monkeypatch.delenv(runtime.CORS_REGEX_ENV_VAR, raising=False)
+    assert runtime.cors_allowed_origin_regex() is None
+    for openish in ("*", ".*", "^.*$"):
+        monkeypatch.setenv(runtime.CORS_REGEX_ENV_VAR, openish)
+        assert runtime.cors_allowed_origin_regex() is None, f"{openish!r} must be rejected"
+    monkeypatch.setenv(runtime.CORS_REGEX_ENV_VAR, r"^https://f1grid01(-[a-z0-9-]+)?\.vercel\.app$")
+    assert runtime.cors_allowed_origin_regex() == r"^https://f1grid01(-[a-z0-9-]+)?\.vercel\.app$"
+
+
+def test_vercel_preview_regex_matches_previews_only():
+    # The exact pattern used on the deployment: production + this project's
+    # previews are allowed; unrelated *.vercel.app and look-alikes are not.
+    import re
+    pat = re.compile(r"^https://f1grid01(-[a-z0-9-]+)?\.vercel\.app$")
+    assert pat.match("https://f1grid01.vercel.app")
+    assert pat.match("https://f1grid01-git-main-mygit72s-projects.vercel.app")
+    assert pat.match("https://f1grid01-o8nb3z5ph-mygit72s-projects.vercel.app")
+    assert not pat.match("https://evil.vercel.app")
+    assert not pat.match("https://f1grid01.evil.com")
+    assert not pat.match("https://f1grid01x.vercel.app")  # different project name
+
+
 # The live middleware behaviour (allowed origin gets the ACAO header, a disallowed
 # origin does not) is exercised end-to-end against the running container by
 # scripts/container_api_checks.sh in the docker-test CI job.
