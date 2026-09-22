@@ -1,0 +1,24 @@
+# Render blueprint for the F1Grid API (inference-only, reads committed artifacts).
+# Deploy: Render dashboard -> New -> Blueprint -> pick this repo. Render builds the
+# Dockerfile, runs it in deployed mode, and auto-redeploys on every push to main.
+services:
+  - type: web
+    name: f1grid-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      # Deployed mode: publish and score are refused (HTTP 403); read-only endpoints
+      # work. The container also defaults F1GRID_DEPLOYED=1, this makes it explicit.
+      - key: F1GRID_DEPLOYED
+        value: "1"
+      # Exact browser origins allowed by CORS (never a wildcard). Set this in the
+      # Render dashboard to the Vercel site URL plus localhost once Vercel is live,
+      # e.g. "https://f1grid.vercel.app,http://localhost:5173". sync: false keeps it
+      # a dashboard-managed secret rather than a value committed here.
+      - key: F1GRID_CORS_ORIGINS
+        sync: false
+    # Render injects $PORT and the Dockerfile CMD binds to it (uvicorn --port $PORT).
