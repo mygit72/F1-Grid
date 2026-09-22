@@ -1,0 +1,31 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Large, regenerable derived caches — NEVER checked in.
+artifacts/fastf1_cache/
+artifacts/data/laps.parquet
+artifacts/data/laps.pkl
+artifacts/data/*.pkl
+# Retroactive/backtest predictions are never part of the public record.
+artifacts/backtests/
+
+# Small serving artifacts a fresh clone needs to serve REAL data — keep tracked.
+# (These override the broad ignores above.)
+!artifacts/data/race_results.parquet
+!artifacts/data/schedule.parquet
+!artifacts/data/tyre_curves.json
+artifacts/models/*.joblib
+!artifacts/models/quali_model.joblib
+!artifacts/models/race_model.joblib
+
+.streamlit/secrets.toml
+*.egg-info/
+.DS_Store
+
+# React showcase app
+web/node_modules/
+web/dist/
+web/.env.local

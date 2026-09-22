@@ -1,0 +1,828 @@
+{
+  "fuel_effect_per_lap": 0.05971,
+  "fuel_source": "estimated from data: laps-weighted mean of per-event fuel coefficients over 58 events",
+  "fuel_estimates": [
+    [
+      0.05070754773527883,
+      959,
+      "2019 R1"
+    ],
+    [
+      0.07187039281149012,
+      724,
+      "2019 R10"
+    ],
+    [
+      0.07160875744150955,
+      176,
+      "2019 R11"
+    ],
+    [
+      0.06207048544566979,
+      1269,
+      "2019 R12"
+    ],
+    [
+      0.10232546739330259,
+      648,
+      "2019 R13"
+    ],
+    [
+      0.056923533202071566,
+      821,
+      "2019 R14"
+    ],
+    [
+      0.044372684351331335,
+      873,
+      "2019 R15"
+    ],
+    [
+      0.0733604654252094,
+      736,
+      "2019 R16"
+    ],
+    [
+      0.08344961162367001,
+      878,
+      "2019 R17"
+    ],
+    [
+      0.04719159562098468,
+      1222,
+      "2019 R18"
+    ],
+    [
+      0.08714696078491206,
+      868,
+      "2019 R19"
+    ],
+    [
+      0.053728589039369605,
+      773,
+      "2019 R2"
+    ],
+    [
+      0.033417220244356366,
+      1032,
+      "2019 R20"
+    ],
+    [
+      0.06706058030488177,
+      1003,
+      "2019 R21"
+    ],
+    [
+      0.07177945268507542,
+      933,
+      "2019 R3"
+    ],
+    [
+      0.08051458349518104,
+      791,
+      "2019 R4"
+    ],
+    [
+      0.058436394931899054,
+      1062,
+      "2019 R5"
+    ],
+    [
+      0.02960703732111945,
+      1225,
+      "2019 R6"
+    ],
+    [
+      0.041907679426316305,
+      1112,
+      "2019 R7"
+    ],
+    [
+      0.06984718822556493,
+      865,
+      "2019 R8"
+    ],
+    [
+      0.038206406574848424,
+      1335,
+      "2019 R9"
+    ],
+    [
+      0.02510170092671123,
+      644,
+      "2020 R1"
+    ],
+    [
+      0.08422950496174154,
+      794,
+      "2020 R10"
+    ],
+    [
+      0.06755935871427818,
+      760,
+      "2020 R11"
+    ],
+    [
+      0.05680253525477638,
+      1212,
+      "2020 R12"
+    ],
+    [
+      0.04794752253643842,
+      888,
+      "2020 R13"
+    ],
+    [
+      0.08205256451942032,
+      696,
+      "2020 R15"
+    ],
+    [
+      0.02513108183392874,
+      1187,
+      "2020 R16"
+    ],
+    [
+      0.047429858271526175,
+      917,
+      "2020 R17"
+    ],
+    [
+      0.03546287449389294,
+      1106,
+      "2020 R2"
+    ],
+    [
+      0.08227869441540615,
+      1093,
+      "2020 R3"
+    ],
+    [
+      0.1031210720691579,
+      652,
+      "2020 R4"
+    ],
+    [
+      0.058869437813399705,
+      896,
+      "2020 R5"
+    ],
+    [
+      0.05839876126300624,
+      1131,
+      "2020 R6"
+    ],
+    [
+      0.08929143465878542,
+      641,
+      "2020 R7"
+    ],
+    [
+      0.044000396999205195,
+      698,
+      "2020 R8"
+    ],
+    [
+      0.08181137662405372,
+      550,
+      "2020 R9"
+    ],
+    [
+      0.05456728878887441,
+      831,
+      "2021 R1"
+    ],
+    [
+      0.09071605435567794,
+      820,
+      "2021 R10"
+    ],
+    [
+      0.07154788302051895,
+      851,
+      "2021 R11"
+    ],
+    [
+      0.06722029141878279,
+      1260,
+      "2021 R13"
+    ],
+    [
+      0.03256599165362457,
+      693,
+      "2021 R14"
+    ],
+    [
+      0.08013990802883546,
+      826,
+      "2021 R15"
+    ],
+    [
+      0.059376291695359545,
+      886,
+      "2021 R17"
+    ],
+    [
+      0.053665353644085645,
+      1129,
+      "2021 R18"
+    ],
+    [
+      0.0484432500943667,
+      1108,
+      "2021 R19"
+    ],
+    [
+      0.23416534222504068,
+      452,
+      "2021 R2"
+    ],
+    [
+      0.07347417704882482,
+      924,
+      "2021 R20"
+    ],
+    [
+      0.043326158716803446,
+      496,
+      "2021 R21"
+    ],
+    [
+      0.06423272593573336,
+      785,
+      "2021 R22"
+    ],
+    [
+      0.04045807673063799,
+      1085,
+      "2021 R3"
+    ],
+    [
+      0.05147630260888392,
+      1090,
+      "2021 R4"
+    ],
+    [
+      0.030112130361153157,
+      1355,
+      "2021 R5"
+    ],
+    [
+      0.03955006188691515,
+      607,
+      "2021 R6"
+    ],
+    [
+      0.07327986535183138,
+      969,
+      "2021 R7"
+    ],
+    [
+      0.046838647959057386,
+      1227,
+      "2021 R8"
+    ],
+    [
+      0.04265252413741645,
+      1207,
+      "2021 R9"
+    ],
+    [
+      0.08376142836302419,
+      858,
+      "2022 R1"
+    ]
+  ],
+  "pooled": {
+    "SOFT": {
+      "deg_rate": 0.01499,
+      "base_offset": 0.383,
+      "n_laps": 10596,
+      "n_stints": 769,
+      "max_life_observed": 49.0,
+      "cliff_lap": 12,
+      "cliff_is_default": true,
+      "cliff_reach_rate": 0.7843,
+      "cliff_observed": true,
+      "cliff_pre_slope": -0.02452,
+      "cliff_post_slope": 0.03028,
+      "cliff_note": "post-cliff slope 0.0303 vs pre -0.0245 over 6037 post-cliff laps"
+    },
+    "MEDIUM": {
+      "deg_rate": 0.02372,
+      "base_offset": 0.3631,
+      "n_laps": 20817,
+      "n_stints": 1092,
+      "max_life_observed": 67.0,
+      "cliff_lap": 22,
+      "cliff_is_default": true,
+      "cliff_reach_rate": 0.5119,
+      "cliff_observed": false,
+      "cliff_pre_slope": 0.01258,
+      "cliff_post_slope": 0.01491,
+      "cliff_note": "post-cliff slope 0.0149 vs pre 0.0126 over 5103 post-cliff laps"
+    },
+    "HARD": {
+      "deg_rate": 0.03951,
+      "base_offset": 0.0,
+      "n_laps": 21216,
+      "n_stints": 804,
+      "max_life_observed": 69.0,
+      "cliff_lap": 34,
+      "cliff_is_default": true,
+      "cliff_reach_rate": 0.3685,
+      "cliff_observed": false,
+      "cliff_pre_slope": 0.03461,
+      "cliff_post_slope": 0.026,
+      "cliff_note": "post-cliff slope 0.0260 vs pre 0.0346 over 2435 post-cliff laps"
+    }
+  },
+  "per_circuit": {
+    "Australian Grand Prix|SOFT": {
+      "deg_rate": -0.02999,
+      "n_laps": 269,
+      "n_stints": 18
+    },
+    "Australian Grand Prix|MEDIUM": {
+      "deg_rate": -0.00184,
+      "n_laps": 443,
+      "n_stints": 14
+    },
+    "Australian Grand Prix|HARD": {
+      "deg_rate": 0.05161,
+      "n_laps": 247,
+      "n_stints": 8
+    },
+    "Bahrain Grand Prix|SOFT": {
+      "deg_rate": 0.109,
+      "n_laps": 833,
+      "n_stints": 87
+    },
+    "Bahrain Grand Prix|MEDIUM": {
+      "deg_rate": 0.10357,
+      "n_laps": 1434,
+      "n_stints": 101
+    },
+    "Chinese Grand Prix|SOFT": {
+      "deg_rate": 0.02304,
+      "n_laps": 127,
+      "n_stints": 13
+    },
+    "Chinese Grand Prix|MEDIUM": {
+      "deg_rate": 0.11118,
+      "n_laps": 407,
+      "n_stints": 23
+    },
+    "Chinese Grand Prix|HARD": {
+      "deg_rate": 0.11842,
+      "n_laps": 399,
+      "n_stints": 19
+    },
+    "Azerbaijan Grand Prix|SOFT": {
+      "deg_rate": -0.08078,
+      "n_laps": 321,
+      "n_stints": 57
+    },
+    "Azerbaijan Grand Prix|MEDIUM": {
+      "deg_rate": -0.00406,
+      "n_laps": 613,
+      "n_stints": 23
+    },
+    "Spanish Grand Prix|SOFT": {
+      "deg_rate": 0.01726,
+      "n_laps": 1542,
+      "n_stints": 87
+    },
+    "Spanish Grand Prix|MEDIUM": {
+      "deg_rate": 0.05924,
+      "n_laps": 1657,
+      "n_stints": 77
+    },
+    "Spanish Grand Prix|HARD": {
+      "deg_rate": 0.08987,
+      "n_laps": 84,
+      "n_stints": 4
+    },
+    "Monaco Grand Prix|SOFT": {
+      "deg_rate": -0.00769,
+      "n_laps": 695,
+      "n_stints": 31
+    },
+    "Monaco Grand Prix|MEDIUM": {
+      "deg_rate": -0.00232,
+      "n_laps": 741,
+      "n_stints": 23
+    },
+    "Monaco Grand Prix|HARD": {
+      "deg_rate": 0.00637,
+      "n_laps": 1144,
+      "n_stints": 24
+    },
+    "Canadian Grand Prix|SOFT": {
+      "deg_rate": 0.01925,
+      "n_laps": 36,
+      "n_stints": 7
+    },
+    "Canadian Grand Prix|MEDIUM": {
+      "deg_rate": -0.0295,
+      "n_laps": 244,
+      "n_stints": 14
+    },
+    "Canadian Grand Prix|HARD": {
+      "deg_rate": 0.02234,
+      "n_laps": 832,
+      "n_stints": 20
+    },
+    "French Grand Prix|MEDIUM": {
+      "deg_rate": -0.0218,
+      "n_laps": 691,
+      "n_stints": 41
+    },
+    "French Grand Prix|HARD": {
+      "deg_rate": 0.0357,
+      "n_laps": 1143,
+      "n_stints": 40
+    },
+    "Austrian Grand Prix|SOFT": {
+      "deg_rate": -0.00655,
+      "n_laps": 405,
+      "n_stints": 28
+    },
+    "Austrian Grand Prix|MEDIUM": {
+      "deg_rate": -0.02003,
+      "n_laps": 1011,
+      "n_stints": 44
+    },
+    "Austrian Grand Prix|HARD": {
+      "deg_rate": 0.02274,
+      "n_laps": 1770,
+      "n_stints": 64
+    },
+    "British Grand Prix|SOFT": {
+      "deg_rate": -0.04334,
+      "n_laps": 157,
+      "n_stints": 19
+    },
+    "British Grand Prix|MEDIUM": {
+      "deg_rate": 0.00062,
+      "n_laps": 717,
+      "n_stints": 52
+    },
+    "British Grand Prix|HARD": {
+      "deg_rate": 0.02725,
+      "n_laps": 1322,
+      "n_stints": 52
+    },
+    "German Grand Prix|SOFT": {
+      "deg_rate": -0.05311,
+      "n_laps": 176,
+      "n_stints": 20
+    },
+    "Hungarian Grand Prix|SOFT": {
+      "deg_rate": 0.04414,
+      "n_laps": 303,
+      "n_stints": 17
+    },
+    "Hungarian Grand Prix|MEDIUM": {
+      "deg_rate": 0.00944,
+      "n_laps": 1336,
+      "n_stints": 58
+    },
+    "Hungarian Grand Prix|HARD": {
+      "deg_rate": 0.06582,
+      "n_laps": 1574,
+      "n_stints": 44
+    },
+    "Belgian Grand Prix|SOFT": {
+      "deg_rate": 0.05003,
+      "n_laps": 468,
+      "n_stints": 33
+    },
+    "Belgian Grand Prix|MEDIUM": {
+      "deg_rate": 0.09117,
+      "n_laps": 499,
+      "n_stints": 31
+    },
+    "Italian Grand Prix|SOFT": {
+      "deg_rate": 0.02365,
+      "n_laps": 591,
+      "n_stints": 37
+    },
+    "Italian Grand Prix|MEDIUM": {
+      "deg_rate": 0.01304,
+      "n_laps": 1093,
+      "n_stints": 55
+    },
+    "Italian Grand Prix|HARD": {
+      "deg_rate": 0.00619,
+      "n_laps": 528,
+      "n_stints": 32
+    },
+    "Singapore Grand Prix|SOFT": {
+      "deg_rate": -0.0201,
+      "n_laps": 190,
+      "n_stints": 12
+    },
+    "Singapore Grand Prix|MEDIUM": {
+      "deg_rate": -0.01621,
+      "n_laps": 238,
+      "n_stints": 13
+    },
+    "Singapore Grand Prix|HARD": {
+      "deg_rate": -0.00117,
+      "n_laps": 445,
+      "n_stints": 19
+    },
+    "Russian Grand Prix|SOFT": {
+      "deg_rate": -0.0422,
+      "n_laps": 397,
+      "n_stints": 23
+    },
+    "Russian Grand Prix|MEDIUM": {
+      "deg_rate": -0.00434,
+      "n_laps": 874,
+      "n_stints": 53
+    },
+    "Russian Grand Prix|HARD": {
+      "deg_rate": 0.03737,
+      "n_laps": 1085,
+      "n_stints": 40
+    },
+    "Japanese Grand Prix|SOFT": {
+      "deg_rate": 0.07983,
+      "n_laps": 314,
+      "n_stints": 24
+    },
+    "Japanese Grand Prix|MEDIUM": {
+      "deg_rate": 0.10123,
+      "n_laps": 397,
+      "n_stints": 19
+    },
+    "Japanese Grand Prix|HARD": {
+      "deg_rate": 0.08306,
+      "n_laps": 167,
+      "n_stints": 7
+    },
+    "Mexican Grand Prix|SOFT": {
+      "deg_rate": 0.02451,
+      "n_laps": 26,
+      "n_stints": 4
+    },
+    "Mexican Grand Prix|MEDIUM": {
+      "deg_rate": 0.01342,
+      "n_laps": 435,
+      "n_stints": 23
+    },
+    "Mexican Grand Prix|HARD": {
+      "deg_rate": 0.01608,
+      "n_laps": 761,
+      "n_stints": 20
+    },
+    "United States Grand Prix|SOFT": {
+      "deg_rate": 0.03536,
+      "n_laps": 185,
+      "n_stints": 14
+    },
+    "United States Grand Prix|MEDIUM": {
+      "deg_rate": 0.04303,
+      "n_laps": 555,
+      "n_stints": 46
+    },
+    "United States Grand Prix|HARD": {
+      "deg_rate": 0.10205,
+      "n_laps": 1014,
+      "n_stints": 49
+    },
+    "Brazilian Grand Prix|SOFT": {
+      "deg_rate": 0.02845,
+      "n_laps": 516,
+      "n_stints": 38
+    },
+    "Brazilian Grand Prix|MEDIUM": {
+      "deg_rate": 0.04147,
+      "n_laps": 433,
+      "n_stints": 22
+    },
+    "Brazilian Grand Prix|HARD": {
+      "deg_rate": 0.04964,
+      "n_laps": 83,
+      "n_stints": 5
+    },
+    "Abu Dhabi Grand Prix|SOFT": {
+      "deg_rate": 0.06415,
+      "n_laps": 264,
+      "n_stints": 29
+    },
+    "Abu Dhabi Grand Prix|MEDIUM": {
+      "deg_rate": 0.02138,
+      "n_laps": 752,
+      "n_stints": 47
+    },
+    "Abu Dhabi Grand Prix|HARD": {
+      "deg_rate": 0.02037,
+      "n_laps": 1689,
+      "n_stints": 59
+    },
+    "Styrian Grand Prix|SOFT": {
+      "deg_rate": 0.01087,
+      "n_laps": 646,
+      "n_stints": 27
+    },
+    "Styrian Grand Prix|MEDIUM": {
+      "deg_rate": 0.01266,
+      "n_laps": 943,
+      "n_stints": 30
+    },
+    "Styrian Grand Prix|HARD": {
+      "deg_rate": 0.04951,
+      "n_laps": 744,
+      "n_stints": 21
+    },
+    "70th Anniversary Grand Prix|MEDIUM": {
+      "deg_rate": 0.00664,
+      "n_laps": 285,
+      "n_stints": 25
+    },
+    "70th Anniversary Grand Prix|HARD": {
+      "deg_rate": 0.01482,
+      "n_laps": 611,
+      "n_stints": 35
+    },
+    "Belgian Grand Prix|HARD": {
+      "deg_rate": 0.05633,
+      "n_laps": 322,
+      "n_stints": 13
+    },
+    "Tuscan Grand Prix|SOFT": {
+      "deg_rate": -0.00474,
+      "n_laps": 316,
+      "n_stints": 21
+    },
+    "Tuscan Grand Prix|MEDIUM": {
+      "deg_rate": 0.06037,
+      "n_laps": 153,
+      "n_stints": 11
+    },
+    "Tuscan Grand Prix|HARD": {
+      "deg_rate": 0.14167,
+      "n_laps": 81,
+      "n_stints": 7
+    },
+    "Eifel Grand Prix|SOFT": {
+      "deg_rate": -0.02065,
+      "n_laps": 323,
+      "n_stints": 26
+    },
+    "Eifel Grand Prix|MEDIUM": {
+      "deg_rate": 0.05002,
+      "n_laps": 356,
+      "n_stints": 22
+    },
+    "Eifel Grand Prix|HARD": {
+      "deg_rate": 0.07231,
+      "n_laps": 81,
+      "n_stints": 4
+    },
+    "Portuguese Grand Prix|SOFT": {
+      "deg_rate": -0.0349,
+      "n_laps": 340,
+      "n_stints": 22
+    },
+    "Portuguese Grand Prix|MEDIUM": {
+      "deg_rate": -0.01703,
+      "n_laps": 1193,
+      "n_stints": 38
+    },
+    "Portuguese Grand Prix|HARD": {
+      "deg_rate": 0.02427,
+      "n_laps": 764,
+      "n_stints": 25
+    },
+    "Emilia Romagna Grand Prix|SOFT": {
+      "deg_rate": 0.02469,
+      "n_laps": 270,
+      "n_stints": 26
+    },
+    "Emilia Romagna Grand Prix|MEDIUM": {
+      "deg_rate": 0.03616,
+      "n_laps": 687,
+      "n_stints": 39
+    },
+    "Emilia Romagna Grand Prix|HARD": {
+      "deg_rate": 0.01054,
+      "n_laps": 383,
+      "n_stints": 15
+    },
+    "Bahrain Grand Prix|HARD": {
+      "deg_rate": 0.12952,
+      "n_laps": 891,
+      "n_stints": 54
+    },
+    "Sakhir Grand Prix|SOFT": {
+      "deg_rate": 0.01169,
+      "n_laps": 329,
+      "n_stints": 18
+    },
+    "Sakhir Grand Prix|MEDIUM": {
+      "deg_rate": 0.00349,
+      "n_laps": 587,
+      "n_stints": 24
+    },
+    "Sakhir Grand Prix|HARD": {
+      "deg_rate": 0.02264,
+      "n_laps": 271,
+      "n_stints": 13
+    },
+    "Azerbaijan Grand Prix|HARD": {
+      "deg_rate": -0.01186,
+      "n_laps": 464,
+      "n_stints": 21
+    },
+    "Dutch Grand Prix|SOFT": {
+      "deg_rate": 0.02901,
+      "n_laps": 354,
+      "n_stints": 17
+    },
+    "Dutch Grand Prix|MEDIUM": {
+      "deg_rate": 0.05968,
+      "n_laps": 481,
+      "n_stints": 17
+    },
+    "Dutch Grand Prix|HARD": {
+      "deg_rate": 0.08143,
+      "n_laps": 425,
+      "n_stints": 14
+    },
+    "Mexico City Grand Prix|MEDIUM": {
+      "deg_rate": -0.015,
+      "n_laps": 459,
+      "n_stints": 20
+    },
+    "Mexico City Grand Prix|HARD": {
+      "deg_rate": 0.04585,
+      "n_laps": 670,
+      "n_stints": 18
+    },
+    "S\u00e3o Paulo Grand Prix|MEDIUM": {
+      "deg_rate": 0.03152,
+      "n_laps": 443,
+      "n_stints": 42
+    },
+    "S\u00e3o Paulo Grand Prix|HARD": {
+      "deg_rate": 0.03939,
+      "n_laps": 665,
+      "n_stints": 30
+    },
+    "Qatar Grand Prix|SOFT": {
+      "deg_rate": -0.02887,
+      "n_laps": 203,
+      "n_stints": 14
+    },
+    "Qatar Grand Prix|MEDIUM": {
+      "deg_rate": 0.02781,
+      "n_laps": 389,
+      "n_stints": 21
+    },
+    "Qatar Grand Prix|HARD": {
+      "deg_rate": 0.0366,
+      "n_laps": 332,
+      "n_stints": 15
+    },
+    "Saudi Arabian Grand Prix|MEDIUM": {
+      "deg_rate": -0.05103,
+      "n_laps": 271,
+      "n_stints": 24
+    },
+    "Saudi Arabian Grand Prix|HARD": {
+      "deg_rate": -0.04826,
+      "n_laps": 225,
+      "n_stints": 13
+    }
+  },
+  "wet": {
+    "INTERMEDIATE": {
+      "status": "labelled_default",
+      "n_laps": 2378,
+      "note": "2378 laps available but wet fitting not enabled; keeping documented default"
+    },
+    "WET": {
+      "status": "labelled_default",
+      "n_laps": 54,
+      "note": "only 54 representative laps (< 300); keeping documented default"
+    }
+  },
+  "n_events": 58,
+  "filter_report": {
+    "total": 63250,
+    "kept": 52801,
+    "dropped": {
+      "no_lap_time": 1141,
+      "no_tyre_life": 69,
+      "lap_1": 1084,
+      "pit_in_lap": 1751,
+      "pit_out_lap": 1618,
+      "safety_car_vsc_yellow": 4658,
+      "large_gap_outlier": 128
+    }
+  }
+}
