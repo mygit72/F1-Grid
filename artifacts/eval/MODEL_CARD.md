@@ -70,20 +70,48 @@ Circuit-level features (pit loss, typical stops, overtaking difficulty, fitted d
 **Validation decision:** strategy features helped on [2023, 2024]. **Held-out:** the gain did NOT generalize (2025 and 2026 both reported above).
 **In production: NO.** They are LEFT OUT: a validation gain that does not generalize to held-out data is not shipped. A null/negative result is a valid, reported outcome; production keeps the base feature set.
 
-## Tyre-degradation fit (item 3)
-Fitted from real FastF1 stint laps over 58 events (52,801 of 63,250 dry laps kept after filtering safety-car/VSC/yellow, pit in/out, lap 1, and large-gap outlier laps). Fuel effect was ESTIMATED from the data: 0.05971 s/lap (estimated from data: laps-weighted mean of per-event fuel coefficients over 58 events).
+## Tyre-degradation fit (items 3 and 6): refit on 2022+ era
+
+Refitted from real FastF1 stint laps over the 2022+ regulation era (57 events;
+50,523 of 60,630 dry laps kept after filtering safety-car/VSC/yellow, pit in/out,
+lap 1, and large-gap outlier laps). Lap coverage is 2022-2024 (2024 partial,
+rounds 1-15); 2025-2026 laps are pending a FastF1 500-calls/hour rate-limit reset.
+Fuel effect was ESTIMATED from the data: 0.06709 s/lap.
 
 | compound | deg (s/lap) | base offset | stints | laps | max life seen | cliff (age) | reach rate | cliff observed |
 |---|---|---|---|---|---|---|---|---|
-| SOFT | 0.01499 | 0.383 | 769 | 10596 | 49.0 | 12 (default) | 0.7843 | True |
-| MEDIUM | 0.02372 | 0.3631 | 1092 | 20817 | 67.0 | 22 (default) | 0.5119 | False |
-| HARD | 0.03951 | 0.0 | 804 | 21216 | 69.0 | 34 (default) | 0.3685 | False |
+| SOFT | 0.07201 | -0.0202 | 525 | 6863 | 49.0 | 12 (default) | 0.7486 | True |
+| MEDIUM | 0.07271 | -0.2872 | 1170 | 19044 | 77.0 | 22 (default) | 0.3151 | False |
+| HARD | 0.05004 | 0.0 | 1047 | 24284 | 78.0 | 34 (default) | 0.2510 | False |
 
-Honest caveats (stated, not hidden):
-- The per-compound linear degradation ordering comes out INVERTED vs the physical soft>medium>hard expectation. This is an identification limit: within a stint tyre-life and lap-number are collinear (only cross-stint variation separates fuel from degradation), and each compound is observed over a different tyre-life range (softs censored young, hards run long), so a single linear slope is not comparable across compounds. On clean synthetic data with proper cross-stint variation the estimator recovers the correct ordering (see tests).
-- The cliff is largely CENSORED: teams pit before the tyre collapses, so the default cliff age is reached only sometimes (see reach rate) and a steeper post-cliff slope is not reliably observed. We therefore KEEP the documented default cliff for every compound, labelled as a default, rather than inventing a cliff location the data never reaches.
-- Intermediate/wet keep labelled defaults (too little representative wet running to fit).
-- Held-out strategy validation (2021, fitted only from prior races): the simulator's fastest-strategy stop count matched the field's actual stop count on 9/20 races with the DEFAULT curves and 9/20 with the FITTED curves; the winner's exact compound set was matched 0/20 either way (the clean-air sim does not model track position). The fitted curves did NOT beat the defaults, so the strategy simulator KEEPS the labelled defaults; the fitted summary is persisted as a diagnostic (artifacts/data/tyre_curves.json).
+Compound ordering: HARD is now correctly the slowest-degrading, but SOFT and
+MEDIUM are inseparable (0.07201 vs 0.07271, MEDIUM marginally faster) and SOFT's
+fitted fresh pace (-0.0202) is slower than MEDIUM's (-0.2872), which is physically
+backwards. So the ordering is still NOT correct (soft is not fastest-degrading).
+This is the same identification limit as before: within a stint tyre-life and
+lap-number are collinear, and each compound is observed over a different tyre-life
+range. On clean synthetic data the estimator recovers the correct ordering (tests).
+
+Held-out validation (12 held-out 2024 races, curves fitted only from prior 2022+
+races):
+
+| metric | DEFAULT curves | FITTED curves |
+|---|---|---|
+| stop-count hit rate (all 12) | 0.333 | 0.417 |
+| winner compound-set hit rate (all 12) | 0.000 | 0.500 |
+| stop-count hit rate (dry-only, 10) | 0.400 | 0.400 |
+| winner compound-set hit rate (dry-only, 10) | 0.000 | 0.600 |
+
+DECISION: KEEP the labelled defaults; the simulator is unchanged. Although the
+fitted curves beat the defaults on the overall metrics, on the fair dry-only
+comparison the stop-count metric is a TIE, and the compound ordering is still
+physically wrong (SOFT mis-fit vs MEDIUM). The winner-set improvement is largely
+an artifact of the defaults being over-conservative (always a 1-stop HARD,HARD),
+not evidence the fitted per-compound physics is right. That is not robust enough,
+on a 12-race 2024-only sample, to overturn the defaults' correct ordering. The
+2022+ fit is persisted as a diagnostic (artifacts/data/tyre_curves.json,
+adopted_in_simulator=false). Intermediate/wet keep labelled defaults. The cliff is
+largely censored (see reach rate), so the default cliff is kept and labelled.
 
 ## Walk-forward over completed [2026] races (separate readout)
 Reported separately so it never disturbs the comparable held-out [2025] numbers above. Each [2026] race is predicted after training on every prior race (all earlier seasons plus earlier rounds of the same season), so it is genuinely out-of-sample.
@@ -141,7 +169,7 @@ in the UI, API, or README. See `f1grid/model/strategy_validate.py` and
 
 ## Known limitations (stated, not hidden)
 - No telemetry/weather features yet beyond the manual rain scenario input.
-- Tyre-degradation curves HAVE now been fitted from real FastF1 stint laps (see the tyre-degradation-fit section), but the fitted per-compound ordering is unreliable (fuel/tyre-life identification limit) and did not beat the labelled defaults on held-out strategy validation, so the simulator keeps the labelled defaults; the fit is persisted as a diagnostic. The cliff is censored and kept as a labelled default. Lap coverage for the fit is 2019-2021 (a FastF1 500-calls/hour rate limit stopped extension to later seasons this round).
+- Tyre-degradation curves HAVE now been refitted from real FastF1 stint laps on the 2022+ regulation era (see the tyre-degradation-fit section). HARD is now correctly the slowest-degrading, but SOFT and MEDIUM remain inseparable (identification limit), so the compound ordering is still not fully correct. The fitted curves beat the labelled defaults on overall held-out 2024 metrics but tied on the fair dry-only stop-count metric, so the simulator KEEPS the labelled defaults; the fit is persisted as a diagnostic. The cliff is censored and kept as a labelled default. Lap coverage for the fit is 2022-2024 (2024 partial); 2025-2026 pending a FastF1 500-calls/hour rate-limit reset.
 - Circuit-level strategy features were built and ablated (item 4). They helped on validation but did not generalize to held-out 2025/2026, so they are NOT in the production model.
 - The lap-by-lap strategy simulator models clean air + stochastic safety cars; it does NOT model wheel-to-wheel traffic or undercut/overcut interactions between specific cars.
 - The 2026 scenario panel's aero/power-unit dials default to neutral (0.5) because they are not observable from finishing-position data alone; anything beyond that is an explicit, named user override, not a learned value.

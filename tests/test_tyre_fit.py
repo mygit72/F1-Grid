@@ -121,3 +121,31 @@ def test_compare_strategies_accepts_fitted_compounds():
     cand = {"a": [StintPlan("MEDIUM", 30), StintPlan("HARD", 27)]}
     res = compare_strategies(90.0, 57, cand, compounds=DEFAULT_COMPOUNDS, n_sims=20)
     assert res and "mean_time" in res[0]
+
+
+def test_labelled_defaults_have_correct_ordering():
+    """The simulator keeps the labelled defaults (item 6 decision), and those
+    defaults have the physically correct ordering soft > medium > hard, unlike
+    the fitted curves whose soft/medium are inseparable."""
+    from f1grid.model.tyres import DEFAULT_COMPOUNDS as D
+    assert D["SOFT"].deg_rate > D["MEDIUM"].deg_rate > D["HARD"].deg_rate
+
+
+def test_2022plus_diagnostic_not_adopted():
+    """The persisted 2022+ refit is a diagnostic only: it records that it was NOT
+    adopted into the simulator, and its lap coverage is the 2022+ era. Skips if the
+    diagnostic artifact is absent (e.g. a clone without a refit)."""
+    import json
+    from f1grid.model.tyre_fit import TYRE_CURVES_JSON
+    if not TYRE_CURVES_JSON.exists():
+        import pytest
+        pytest.skip("no tyre_curves.json diagnostic present")
+    d = json.loads(TYRE_CURVES_JSON.read_text(encoding="utf-8"))
+    if "adopted_in_simulator" in d:  # present once refit this round
+        assert d["adopted_in_simulator"] is False
+        assert "2022" in d.get("lap_coverage", "")
+        # HARD is at least correctly the slowest-degrading in the 2022+ fit.
+        pooled = d.get("pooled", {})
+        if all(c in pooled for c in ("SOFT", "MEDIUM", "HARD")):
+            assert pooled["HARD"]["deg_rate"] < pooled["SOFT"]["deg_rate"]
+            assert pooled["HARD"]["deg_rate"] < pooled["MEDIUM"]["deg_rate"]
