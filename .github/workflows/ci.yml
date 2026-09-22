@@ -52,6 +52,7 @@ jobs:
           build_secs=$((end - start))
           size_bytes=$(docker image inspect f1grid-api:ci --format '{{.Size}}')
           size_mb=$(awk "BEGIN{printf \"%.1f\", ${size_bytes}/1048576}")
+          echo "IMAGE_SIZE=${size_mb} MB  BUILD_TIME=${build_secs} s"
           {
             echo "### Docker image"
             echo ""

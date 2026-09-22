@@ -128,8 +128,12 @@ def publish_next(season: int = 2026, rain_prob: float = 0.0,
     return path
 
 
-def score_published(results: pd.DataFrame | None = None) -> list[tuple[int, int]]:
-    """Grade every PUBLIC prediction whose race now has a real result."""
+def score_published(results: pd.DataFrame | None = None) -> list[dict]:
+    """Grade every PUBLIC prediction whose race now has a real result.
+
+    Returns the list of grade rows (each carries season/round and the metrics),
+    so callers can append result sections to the matching releases.
+    """
     results = results if results is not None else load_results()
     seen, scored = set(), []
     for rec in load_predictions():
@@ -143,7 +147,7 @@ def score_published(results: pd.DataFrame | None = None) -> list[tuple[int, int]
             continue
         row = score_race(key[0], key[1], results)
         if row:
-            scored.append(key)
+            scored.append(row)
             print(f"  Scored {key[0]} R{key[1]} {rec['event']}: "
                   f"top1={row['top1_acc']}, podium={row['podium_acc']}, "
                   f"spearman={row['spearman']} (baseline {row['baseline_spearman']})")
@@ -160,6 +164,13 @@ def main():
     ap.add_argument("--rain-prob", type=float, default=0.0)
     ap.add_argument("--backtest", action="store_true",
                     help="Store to the separate backtest archive instead of the public record.")
+    ap.add_argument("--repo", default=None,
+                    help="owner/name of the GitHub repo; enables appending a "
+                         "Result section to each graded race's release.")
+    ap.add_argument("--no-push", action="store_true",
+                    help="Regenerate and commit reports after scoring but do not push.")
+    ap.add_argument("--dry-run-release", action="store_true",
+                    help="Render the updated release bodies without editing GitHub.")
     args = ap.parse_args()
 
     if not (args.next or args.score):
@@ -167,7 +178,15 @@ def main():
     if args.next:
         publish_next(season=args.season, rain_prob=args.rain_prob, backtest=args.backtest)
     if args.score:
-        score_published()
+        results = load_results()
+        scored_rows = score_published(results)
+        # Append a Result section to each graded release and regenerate the
+        # reports (TRACK_RECORD.md + README track record), then commit/push.
+        from f1grid import publish_git as PG
+        fin = PG.finalize_after_score(
+            args.repo, scored_rows, results,
+            push=not args.no_push, dry_run_release=args.dry_run_release)
+        print(f"Finalize: status={fin['status']} releases={fin['releases']}")
         tr = track_record()
         if not tr.empty:
             print("\nPublic track record:")

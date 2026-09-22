@@ -16,11 +16,18 @@ from pathlib import Path
 import pandas as pd
 
 from f1grid.config import ROOT, PRED_DIR, PROV_DIR
+from f1grid import schema as S
 from f1grid.score.scorer import track_record, SCORECARD
 from f1grid.store.predictions import load_predictions
 from f1grid.provenance import read_provenance
 
 TRACK_RECORD_PATH = ROOT / "TRACK_RECORD.md"
+README_PATH = ROOT / "README.md"
+
+README_TR_BEGIN = "<!-- F1GRID:TRACKRECORD:BEGIN -->"
+README_TR_END = "<!-- F1GRID:TRACKRECORD:END -->"
+
+_MEDALS = {1: "\U0001F947", 2: "\U0001F948", 3: "\U0001F949"}
 
 _HEADER = [
     "# F1Grid public track record",
@@ -148,6 +155,128 @@ def write_track_record(path: Path = TRACK_RECORD_PATH,
     return path
 
 
+def _scorecard_index(scorecard: Path) -> dict:
+    idx: dict = {}
+    if scorecard.exists():
+        df = pd.read_csv(scorecard, encoding="utf-8")
+        for _, r in df.iterrows():
+            idx[(int(r["season"]), int(r["round"]))] = r.to_dict()
+    return idx
+
+
+def _podium_str(by_pos: dict) -> str:
+    parts = [f"{_MEDALS[p]} {by_pos[p]}" for p in (1, 2, 3) if p in by_pos]
+    return " ".join(parts) if parts else "-"
+
+
+def _predicted_podium(rec: dict) -> dict:
+    order = sorted(rec["prediction"], key=lambda r: r["predicted_position"])
+    return {int(r["predicted_position"]): r["driver"] for r in order[:3]}
+
+
+def _actual_podium(results, season: int, round_no: int) -> dict | None:
+    if results is None:
+        return None
+    r = results[(results[S.SEASON] == season) & (results[S.ROUND] == round_no)]
+    if r.empty:
+        return None
+    top = r.nsmallest(3, S.FINISH)
+    return {int(row[S.FINISH]): row[S.DRIVER] for _, row in top.iterrows()}
+
+
+def render_readme_track_record(scorecard: Path = SCORECARD,
+                               pred_dir: Path = PRED_DIR,
+                               prov_dir: Path = PROV_DIR,
+                               results=None) -> str:
+    """The README "Track record" section (markdown between its sentinels).
+
+    One row per published race: predicted podium (medals), actual podium (medals)
+    or "pending", podium hits, whether the baseline was beaten, and links to the
+    GitHub Release and the Wayback snapshot. Ends with a running summary that
+    claims nothing beyond the graded races. Pure function of the store + scorecard
+    (+ the real results parquet, read only when a graded race needs its podium)."""
+    recs = sorted(load_predictions(pred_dir=pred_dir),
+                  key=lambda r: (int(r["season"]), int(r["round"]), r["made_at_utc"]))
+    sc = _scorecard_index(scorecard)
+    if results is None and any((int(r["season"]), int(r["round"])) in sc for r in recs):
+        from f1grid.data.ingest import load_results
+        results = load_results()
+
+    L = ["## Track record", "",
+         "Generated from the immutable, timestamped prediction store and the",
+         "post-race scorecard (the same source as TRACK_RECORD.md). Actual podiums",
+         "come from the real FastF1 result once the race has run. Regenerated on",
+         "every publish and score; do not edit by hand.", ""]
+    header = ["Race", "Predicted podium", "Actual podium", "Podium hits",
+              "Beat baseline", "Links"]
+    L.append("| " + " | ".join(header) + " |")
+    L.append("| " + " | ".join("---" for _ in header) + " |")
+
+    graded = 0
+    total_hits = 0
+    beat = 0
+    for rec in recs:
+        s, rd = int(rec["season"]), int(rec["round"])
+        pred_pod = _podium_str(_predicted_podium(rec))
+        prov = read_provenance(Path(rec["_path"]), prov_dir) if rec.get("_path") else None
+        links = []
+        if prov:
+            rel = (prov.get("release") or {}).get("url")
+            wb = (prov.get("wayback") or {}).get("snapshot_url")
+            if rel:
+                links.append(f"[release]({rel})")
+            if wb:
+                links.append(f"[wayback]({wb})")
+        links_str = " ".join(links) if links else "-"
+
+        if (s, rd) in sc:
+            graded += 1
+            row = sc[(s, rd)]
+            act = _podium_str(_actual_podium(results, s, rd) or {})
+            hits = int(round(float(row.get("podium_acc", 0.0)) * 3))
+            total_hits += hits
+            bb = row.get("beat_baseline") in (1, 1.0, True)
+            beat += 1 if bb else 0
+            hits_str, beat_str = f"{hits}/3", ("YES" if bb else "NO")
+        else:
+            act, hits_str, beat_str = "pending", "pending", "pending"
+
+        L.append(f"| {s} R{rd} {rec['event']} | {pred_pod} | {act} | "
+                 f"{hits_str} | {beat_str} | {links_str} |")
+
+    L.append("")
+    L.append(f"Summary: {graded} race(s) graded, {total_hits} podium pick(s) "
+             f"correct across them, baseline beaten in {beat} of {graded} graded "
+             f"race(s).")
+    return "\n".join(L).strip("\n")
+
+
+def update_readme_track_record(path: Path = README_PATH,
+                               scorecard: Path = SCORECARD,
+                               pred_dir: Path = PRED_DIR,
+                               prov_dir: Path = PROV_DIR,
+                               results=None) -> Path:
+    """Insert or replace the README track-record section idempotently."""
+    section = render_readme_track_record(scorecard, pred_dir, prov_dir, results)
+    block = f"{README_TR_BEGIN}\n{section}\n{README_TR_END}"
+    text = path.read_text(encoding="utf-8")
+    if README_TR_BEGIN in text and README_TR_END in text:
+        pre = text[:text.index(README_TR_BEGIN)]
+        post = text[text.index(README_TR_END) + len(README_TR_END):]
+        new = pre + block + post
+    else:
+        anchor = "\n## Architecture"
+        if anchor in text:
+            i = text.index(anchor)
+            new = text[:i] + "\n" + block + "\n" + text[i:]
+        else:
+            new = text.rstrip("\n") + "\n\n" + block + "\n"
+    path.write_text(new, encoding="utf-8")
+    return path
+
+
 if __name__ == "__main__":
     p = write_track_record()
     print(f"Wrote {p}")
+    r = update_readme_track_record()
+    print(f"Updated {r}")

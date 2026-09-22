@@ -21,8 +21,10 @@ from pathlib import Path
 from typing import Callable
 
 from f1grid.config import ROOT, PROV_DIR
-from f1grid.reporting import write_track_record, TRACK_RECORD_PATH
+from f1grid.reporting import (write_track_record, TRACK_RECORD_PATH,
+                              update_readme_track_record, README_PATH)
 from f1grid import provenance as prov
+from f1grid import release_notes as RN
 
 # A pusher takes (remote, branch, cwd) and returns (ok, output).
 Pusher = Callable[[str, str, Path], "tuple[bool, str]"]
@@ -81,6 +83,7 @@ def publish_commit_push(
     pusher: Pusher | None = None,
     cwd: Path = ROOT,
     track_record_path: Path = TRACK_RECORD_PATH,
+    readme_path: Path | None = None,
     collect_provenance: bool = True,
     prov_dir: Path = PROV_DIR,
     gh: str | None = None,
@@ -134,8 +137,22 @@ def publish_commit_push(
         result["provenance"] = data
         committed_paths.append(prov.sidecar_path(pred_path, prov_dir))
 
-    # 4. regenerate TRACK_RECORD.md (with proof links) and commit it + sidecar.
+        # 3b. render medal-style notes onto the release GitHub just created. The
+        # attached asset (the immutable prediction file) is never touched: only
+        # the release description is set. Non-fatal, recorded like the proofs.
+        if data.get("release") and not data.get("release_error"):
+            try:
+                RN.set_prediction_notes_on_release(repo, rec, pred_path.name, gh=gh)
+                result["release_notes"] = {"ok": True}
+            except Exception as e:  # noqa: BLE001 - record, do not fake
+                result["release_notes"] = {"ok": False, "error": str(e)}
+
+    # 4. regenerate TRACK_RECORD.md (with proof links) and commit it + sidecar,
+    #    plus the README track-record section when a README path is given.
     write_track_record(track_record_path)
+    if readme_path is not None:
+        update_readme_track_record(readme_path)
+        committed_paths.append(readme_path)
     spec = [str(p) for p in committed_paths]
     for s in spec:
         _require(_git(["add", "--", s], cwd), f"git add {s}")
@@ -152,6 +169,85 @@ def publish_commit_push(
             result["pushes"].append({"what": "track_record", "ok": ok, "output": out})
             if not ok:
                 result["status"] = "push_failed_after_track_record_commit"
+                return result
+
+    result["ok"] = True
+    result["status"] = "pushed" if push else "committed_no_push"
+    return result
+
+
+def finalize_after_score(
+    repo: str | None,
+    scored_rows: list[dict],
+    results,
+    *,
+    remote: str = "origin",
+    branch: str | None = None,
+    push: bool = True,
+    pusher: Pusher | None = None,
+    cwd: Path = ROOT,
+    track_record_path: Path = TRACK_RECORD_PATH,
+    readme_path: Path = README_PATH,
+    gh: str | None = None,
+    do_release: bool = True,
+    dry_run_release: bool = False,
+) -> dict:
+    """After grading, append a "Result" section to each graded race's release and
+    regenerate the reports (TRACK_RECORD.md + README track record), then commit and
+    push them.
+
+    `scored_rows` is the list of grade dicts the scorer returned (each carries
+    season/round and the metrics). Appending a result never rewrites the release's
+    prediction block (release_notes.append_result_block asserts that). Set
+    `dry_run_release=True` to render the new bodies without editing anything on
+    GitHub. A failed push is reported, never faked.
+    """
+    from f1grid.store.predictions import latest_prediction
+    from f1grid import schema as S
+
+    branch = branch or current_branch(cwd)
+    do_push = pusher or _default_push
+    result: dict = {"ok": False, "status": "started", "releases": [],
+                    "report_commit": None, "pushes": []}
+
+    if do_release and repo:
+        for grade in scored_rows:
+            s, rd = int(grade["season"]), int(grade["round"])
+            rec = latest_prediction(s, rd)
+            if rec is None:
+                result["releases"].append({"race": f"{s} R{rd}", "ok": False,
+                                           "error": "no stored prediction"})
+                continue
+            a = results[(results[S.SEASON] == s) & (results[S.ROUND] == rd)]
+            a = a.sort_values(S.FINISH)
+            actual_order = [{"driver": r[S.DRIVER], "finish": int(r[S.FINISH]),
+                             "team": r.get(S.TEAM) if hasattr(r, "get") else None}
+                            for _, r in a.iterrows()]
+            try:
+                RN.add_result_section_to_release(
+                    repo, rec, grade, actual_order, gh=gh, dry_run=dry_run_release)
+                result["releases"].append({"race": f"{s} R{rd}", "ok": True,
+                                           "dry_run": dry_run_release})
+            except Exception as e:  # noqa: BLE001 - record, do not fake
+                result["releases"].append({"race": f"{s} R{rd}", "ok": False,
+                                           "error": str(e)})
+
+    # Regenerate both reports from the store + updated scorecard.
+    write_track_record(track_record_path)
+    update_readme_track_record(readme_path)
+
+    committed = [track_record_path, readme_path]
+    for c in committed:
+        _require(_git(["add", "--", str(c)], cwd), f"git add {c}")
+    diff = _git(["diff", "--cached", "--quiet", "--", *[str(c) for c in committed]], cwd)
+    if diff.returncode != 0:
+        result["report_commit"] = commit_only(
+            committed, "Update track record and README after scoring", cwd)
+        if push:
+            ok, out = do_push(remote, branch, cwd)
+            result["pushes"].append({"what": "reports", "ok": ok, "output": out})
+            if not ok:
+                result["status"] = "push_failed_after_report_commit"
                 return result
 
     result["ok"] = True

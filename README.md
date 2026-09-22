@@ -51,6 +51,21 @@ where every claim can be traced back to a verifiable evaluation.
   from real historical results** and can be overridden — depth without
   hidden guesswork (`model/panel.py`, `model/defaults.py`).
 
+<!-- F1GRID:TRACKRECORD:BEGIN -->
+## Track record
+
+Generated from the immutable, timestamped prediction store and the
+post-race scorecard (the same source as TRACK_RECORD.md). Actual podiums
+come from the real FastF1 result once the race has run. Regenerated on
+every publish and score; do not edit by hand.
+
+| Race | Predicted podium | Actual podium | Podium hits | Beat baseline | Links |
+| --- | --- | --- | --- | --- | --- |
+| 2026 R15 Azerbaijan Grand Prix | 🥇 ANT 🥈 RUS 🥉 NOR | pending | pending | pending | [release](https://github.com/mygit72/F1-Grid/releases/tag/pred-2026-R15) [wayback](http://web.archive.org/web/20260922105143/https://raw.githubusercontent.com/mygit72/F1-Grid/main/artifacts/predictions/2026_R15_Azerbaijan_Grand_Prix__2026-09-21T113507Z__74c95ccf0d_77fc5a.json) |
+
+Summary: 0 race(s) graded, 0 podium pick(s) correct across them, baseline beaten in 0 of 0 graded race(s).
+<!-- F1GRID:TRACKRECORD:END -->
+
 ## Architecture
 
 ```
