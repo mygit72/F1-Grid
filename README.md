@@ -1,5 +1,18 @@
 # F1Grid
 
+[![CI](https://github.com/mygit72/F1-Grid/actions/workflows/ci.yml/badge.svg)](https://github.com/mygit72/F1-Grid/actions/workflows/ci.yml)
+
+## Live demo
+
+- Web app (Vercel): https://f1grid01.vercel.app
+- API (Render, FastAPI): https://f1grid-api-ncbj.onrender.com (see `/docs` and `/about`)
+- Streamlit app: https://f1-grid-va69eanxsk97khfcuujkfl.streamlit.app
+
+The API and Streamlit app run in deployed mode: read-only endpoints work, and
+publish and score are refused. The API is on a free tier that sleeps after
+inactivity, so the first request after a while is a cold start and can take up to
+about a minute; the web app shows a "waking up the server" message while it wakes.
+
 A Formula 1 prediction engine built around one rule: **a feature describing a
 race may only use information available before that race starts.** Every
 result in this repo is produced by walk-forward evaluation (train on the past,
