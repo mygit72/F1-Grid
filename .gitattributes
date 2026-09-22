@@ -1,0 +1,8 @@
+# Keep published prediction files EXACTLY as written: byte-for-byte, so the
+# stored content_hash always verifies and a clone reproduces them precisely.
+artifacts/predictions/*.json -text
+
+# Binary serving artifacts must never be line-ending converted.
+*.parquet binary
+*.joblib binary
+*.pkl binary
