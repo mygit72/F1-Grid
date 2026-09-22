@@ -1,5 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "./lib/api";
+import { parseModelCardFacts } from "./lib/facts";
+import BackgroundFX from "./components/BackgroundFX";
+import Hero from "./components/Hero";
+import Podium from "./components/Podium";
+import PredictionSkeleton from "./components/PredictionSkeleton";
 import TimingTower from "./components/TimingTower";
 import TrackMap from "./components/TrackMap";
 import StrategyGantt from "./components/StrategyGantt";
@@ -26,10 +31,7 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     const slowTimer = setTimeout(() => !cancelled && setSlow(true), 2500);
-
     async function connect() {
-      // Retry the initial handshake a few times so a cold start resolves to a
-      // successful load rather than a one-shot error.
       for (let attempt = 0; attempt < 12 && !cancelled; attempt++) {
         try {
           const info = await api.about();
@@ -48,85 +50,47 @@ export default function App() {
     return () => { cancelled = true; clearTimeout(slowTimer); };
   }, []);
 
+  const facts = useMemo(() => parseModelCardFacts(about?.model_card), [about]);
+
   return (
-    <div style={{ maxWidth: 1180, margin: "0 auto", padding: "28px 24px 80px" }}>
-      <header style={{ marginBottom: 22 }}>
-        <div className="eyebrow">
-          <span className="dot" /> F1GRID · LIVE PREDICTION ENGINE
-        </div>
-        <h1 className="display-title">Race weekend, predicted honestly.</h1>
+    <>
+      <BackgroundFX />
+      <div className="wrap">
+        <Hero facts={facts} />
+
         {serverStatus === "connecting" && slow && (
-          <div
-            data-testid="waking-banner"
-            style={{
-              marginTop: 10, padding: "8px 12px", borderRadius: 6,
-              background: "rgba(52,152,219,0.12)",
-              border: "1px solid rgba(52,152,219,0.35)",
-              color: "var(--telemetry)", fontSize: "0.8rem", maxWidth: 640,
-            }}
-          >
-            Waking up the server. The free-tier API sleeps after inactivity, so
-            the first request can take up to a minute. Hang tight, retrying...
+          <div className="banner banner-wake" data-testid="waking-banner">
+            <span className="spin-dot" />
+            Waking up the server. The free-tier API sleeps after inactivity, so the
+            first request can take up to a minute. Hang tight, retrying...
           </div>
         )}
         {serverStatus === "error" && (
-          <div
-            data-testid="server-error-banner"
-            style={{
-              marginTop: 10, padding: "8px 12px", borderRadius: 6,
-              background: "rgba(224,165,46,0.12)",
-              border: "1px solid rgba(224,165,46,0.35)",
-              color: "var(--warn)", fontSize: "0.8rem", maxWidth: 640,
-            }}
-          >
-            Could not reach the API after several tries. It may still be waking
-            up; reload the page in a moment.
+          <div className="banner banner-warn" data-testid="server-error-banner">
+            Could not reach the API after several tries. It may still be waking up;
+            reload the page in a moment.
           </div>
         )}
         {about && !about.is_real_data && (
-          <div
-            style={{
-              marginTop: 10,
-              padding: "8px 12px",
-              borderRadius: 6,
-              background: "rgba(224,165,46,0.12)",
-              border: "1px solid rgba(224,165,46,0.35)",
-              color: "var(--warn)",
-              fontSize: "0.8rem",
-              maxWidth: 640,
-            }}
-          >
-            Running on synthetic demo data - no real FastF1 cache on this
-            deployment yet. Every number is real math on fake results.
+          <div className="banner banner-warn">
+            Running on synthetic demo data. No real FastF1 cache on this deployment
+            yet, so every number is real math on fake results.
           </div>
         )}
-      </header>
 
-      <nav style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-        {NAV.map((n) => (
-          <button
-            key={n.id}
-            onClick={() => setTab(n.id)}
-            style={{
-              background: tab === n.id ? "var(--signal)" : "var(--panel)",
-              color: tab === n.id ? "#05070A" : "var(--text)",
-              border: "1px solid var(--line)",
-              borderRadius: 6,
-              padding: "8px 16px",
-              fontSize: "0.82rem",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            {n.label}
-          </button>
-        ))}
-      </nav>
+        <nav style={{ display: "flex", gap: 8, margin: "22px 0 24px", flexWrap: "wrap" }}>
+          {NAV.map((n) => (
+            <button key={n.id} className="btn" aria-pressed={tab === n.id} onClick={() => setTab(n.id)}>
+              {n.label}
+            </button>
+          ))}
+        </nav>
 
-      {tab === "race" && <RaceView />}
-      {tab === "manual" && <ManualGridView />}
-      {tab === "strategy" && <StrategyView />}
-    </div>
+        {tab === "race" && <RaceView />}
+        {tab === "manual" && <ManualGridView />}
+        {tab === "strategy" && <StrategyView />}
+      </div>
+    </>
   );
 }
 
@@ -153,6 +117,7 @@ function RaceView() {
 
   useEffect(() => {
     if (season == null || round == null) return;
+    setPrediction(null);
     api
       .getPrediction(season, round, { rainProb: rain, useRealGrid })
       .then(setPrediction)
@@ -163,25 +128,20 @@ function RaceView() {
   const roundsForSeason = races.filter((r) => r.season === season);
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 20 }}>
-      <div className="panel" style={{ padding: 16, alignSelf: "start" }}>
+    <div className="race-grid" style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 20 }}>
+      <div className="panel glass" style={{ padding: 16, alignSelf: "start" }}>
         <div className="eyebrow" style={{ marginBottom: 10 }}>SELECT RACE</div>
         <Select label="Season" value={season} onChange={setSeason}
                 options={seasons.map((s) => ({ value: s, label: s }))} />
-        <Select
-          label="Grand Prix" value={round} onChange={setRound}
-          options={roundsForSeason.map((r) => ({ value: r.round, label: r.event }))}
-        />
+        <Select label="Grand Prix" value={round} onChange={setRound}
+                options={roundsForSeason.map((r) => ({ value: r.round, label: r.event }))} />
 
         <div className="eyebrow" style={{ marginTop: 18, marginBottom: 8 }}>SCENARIO</div>
-        <label style={{ fontSize: "0.78rem", color: "var(--muted)" }}>
-          Rain probability - {rain}%
-        </label>
-        <input
-          type="range" min={0} max={100} step={5} value={rain}
-          onChange={(e) => setRain(Number(e.target.value))}
-          style={{ width: "100%", marginTop: 6 }}
-        />
+        <label style={{ fontSize: "0.78rem", color: "var(--muted)" }}>Rain probability {rain}%</label>
+        <input type="range" min={0} max={100} step={5} value={rain}
+               aria-label="Rain probability percent"
+               onChange={(e) => setRain(Number(e.target.value))}
+               style={{ width: "100%", marginTop: 6 }} />
 
         <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14, fontSize: "0.8rem" }}>
           <input type="checkbox" checked={useRealGrid} onChange={(e) => setUseRealGrid(e.target.checked)} />
@@ -192,24 +152,19 @@ function RaceView() {
       <div>
         {prediction ? (
           <>
+            <Podium predictions={prediction.predictions} />
             <StrategyMeter meter={prediction.strategy_meter} />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-              <TimingTower
-                predictions={prediction.predictions}
-                highlightDriver={highlight}
-                onSelectDriver={setHighlight}
-              />
+            <div className="race-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+              <TimingTower predictions={prediction.predictions} highlightDriver={highlight} onSelectDriver={setHighlight} />
               <TrackMap predictions={prediction.predictions} highlightDriver={highlight} />
             </div>
             <p style={{ color: "var(--muted)", fontSize: "0.78rem" }}>
-              {prediction.event} · {prediction.used_real_grid ? "real grid given" : "predicted grid (forecast)"} ·
+              {prediction.event} / {prediction.used_real_grid ? "real grid given" : "predicted grid (forecast)"} /
               rain scenario {Math.round(prediction.rain_prob * 100)}%
             </p>
           </>
         ) : (
-          <div className="panel" style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>
-            Loading prediction…
-          </div>
+          <PredictionSkeleton />
         )}
       </div>
     </div>
@@ -232,12 +187,12 @@ function ManualGridView() {
   };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 20 }}>
+    <div className="manual-grid" style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 20 }}>
       <GridBuilder onPredict={handlePredict} loading={loading} />
       {result ? (
         <GridComparison yourGrid={result.your_grid} predictedFinish={result.predicted_finish} />
       ) : (
-        <div className="panel" style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>
+        <div className="panel glass" style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>
           Build a grid and click predict to see your input next to the model's output.
         </div>
       )}
@@ -258,27 +213,23 @@ function StrategyView() {
   };
 
   useEffect(() => {
-    api
-      .compareStrategy({
-        base_lap_time: 90.0, total_laps: totalLaps, rain_prob: rain / 100,
-        sc_lambda: 0.6, strategies: candidates,
-      })
-      .then(setResults);
+    api.compareStrategy({
+      base_lap_time: 90.0, total_laps: totalLaps, rain_prob: rain / 100,
+      sc_lambda: 0.6, strategies: candidates,
+    }).then(setResults);
   }, [rain]);
 
   return (
     <div>
-      <div className="panel" style={{ padding: 16, marginBottom: 16, maxWidth: 400 }}>
-        <label style={{ fontSize: "0.78rem", color: "var(--muted)" }}>
-          Rain probability - {rain}%
-        </label>
-        <input
-          type="range" min={0} max={100} step={5} value={rain}
-          onChange={(e) => setRain(Number(e.target.value))}
-          style={{ width: "100%", marginTop: 6 }}
-        />
+      <div className="panel glass" style={{ padding: 16, marginBottom: 16, maxWidth: 400 }}>
+        <label style={{ fontSize: "0.78rem", color: "var(--muted)" }}>Rain probability {rain}%</label>
+        <input type="range" min={0} max={100} step={5} value={rain}
+               aria-label="Rain probability percent"
+               onChange={(e) => setRain(Number(e.target.value))}
+               style={{ width: "100%", marginTop: 6 }} />
       </div>
-      <StrategyGantt results={results} totalLaps={totalLaps} />
+      {results ? <StrategyGantt results={results} totalLaps={totalLaps} />
+               : <div className="skeleton" style={{ height: 220, borderRadius: 12 }} />}
     </div>
   );
 }
@@ -286,20 +237,11 @@ function StrategyView() {
 function Select({ label, value, onChange, options }) {
   return (
     <div style={{ marginBottom: 10 }}>
-      <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: 4 }}>
-        {label}
-      </label>
-      <select
-        value={value ?? ""}
-        onChange={(e) => onChange(Number(e.target.value) || e.target.value)}
-        style={{
-          width: "100%", background: "var(--void)", border: "1px solid var(--line)",
-          borderRadius: 6, color: "var(--text)", padding: "7px 8px", fontSize: "0.82rem",
-        }}
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
+      <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: 4 }}>{label}</label>
+      <select value={value ?? ""} onChange={(e) => onChange(Number(e.target.value) || e.target.value)}
+        style={{ width: "100%", background: "var(--void)", border: "1px solid var(--line)",
+                 borderRadius: 6, color: "var(--text)", padding: "7px 8px", fontSize: "0.82rem" }}>
+        {options.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
       </select>
     </div>
   );

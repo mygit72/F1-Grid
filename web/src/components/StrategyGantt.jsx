@@ -19,8 +19,10 @@ export default function StrategyGantt({ results, totalLaps }) {
   if (!results?.length) return null;
   const best = results[0];
 
+  const lapTicks = [0, 0.25, 0.5, 0.75, 1].map((f) => Math.round(f * totalLaps));
+
   return (
-    <div className="panel" style={{ padding: 16 }}>
+    <div className="panel glass" style={{ padding: 16 }}>
       {results.map((r, idx) => {
         let lapCursor = 0;
         return (
@@ -46,7 +48,8 @@ export default function StrategyGantt({ results, totalLaps }) {
                 height: 22,
                 borderRadius: 4,
                 overflow: "hidden",
-                background: "var(--void)",
+                background:
+                  "repeating-linear-gradient(90deg, var(--void) 0, var(--void) calc(25% - 1px), rgba(35,44,58,0.8) calc(25% - 1px), rgba(35,44,58,0.8) 25%)",
                 border: "1px solid var(--line)",
               }}
             >
@@ -88,6 +91,20 @@ export default function StrategyGantt({ results, totalLaps }) {
           </div>
         );
       })}
+
+      {/* lap axis: tick marks + mono lap numbers, engineering-tool style */}
+      <div style={{ position: "relative", height: 18, margin: "2px 0 10px" }} aria-hidden="true">
+        {lapTicks.map((lap, i) => (
+          <div key={lap} style={{
+            position: "absolute", left: `${(i / (lapTicks.length - 1)) * 100}%`,
+            transform: i === lapTicks.length - 1 ? "translateX(-100%)" : i === 0 ? "none" : "translateX(-50%)",
+            textAlign: "center",
+          }}>
+            <div style={{ width: 1, height: 5, background: "var(--line)", margin: "0 auto" }} />
+            <span className="axis-label">L{lap}</span>
+          </div>
+        ))}
+      </div>
 
       <div style={{ display: "flex", gap: 14, marginTop: 4, flexWrap: "wrap" }}>
         {Object.entries(COMPOUND_COLORS).map(([name, color]) => (

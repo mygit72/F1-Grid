@@ -43,9 +43,32 @@ feats = build_features_cached(results)
 pipe, used_saved = load_or_train_pipeline(len(results), feats, CONFIG.eval_seasons)
 races = available_races(feats)
 
+# Factual subhead generated from real artifacts: the process, the train/held-out
+# split, and the pre-qualifying baseline result. Any claim that cannot be parsed is
+# simply omitted, so nothing unsupported is shown.
+import re as _re
+
+_card = load_model_card_text() or ""
+_n2026 = int(feats[feats[S.SEASON] == 2026][S.ROUND].nunique()) if not feats.empty else 0
+_facts = ["Published before each race, graded after."]
+_tr = _re.search(r"Trained on:\s*\[([^\]]+)\]", _card)
+_ho = _re.search(r"Evaluated \(held out\) on:\s*\[([^\]]+)\]", _card)
+if _tr and _ho:
+    _ys = [y.strip() for y in _tr.group(1).split(",")]
+    _facts.append(f"Trained on {_ys[0]} to {_ys[-1]}, held out on {_ho.group(1).strip()}.")
+_bm = _re.search(
+    r"completed \[2026\][\s\S]*?Beats pre-qualifying baselines:\s*(YES|NOT YET)"
+    r"\**\s*\(pipeline spearman\s*([\d.]+)\s*vs strongest baseline[^)]*?([\d.]+)\)",
+    _card)
+if _bm and _bm.group(1) == "YES" and _n2026:
+    _facts.append(
+        f"Beats the pre-qualifying baseline on the completed 2026 season "
+        f"({_n2026} races): Spearman {_bm.group(2)} vs {_bm.group(3)}.")
+
 st.markdown(
     "<div class='section-eyebrow'>F1GRID</div>"
-    "<h1 style='margin-top:0;'>Race weekend prediction, honestly evaluated</h1>",
+    "<h1 style='margin-top:0;'>Race weekend prediction</h1>"
+    f"<div style='color:#7c8794;margin-top:-4px;font-size:0.9rem;'>{' '.join(_facts)}</div>",
     unsafe_allow_html=True,
 )
 

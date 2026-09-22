@@ -46,6 +46,22 @@ export default function TrackMap({ predictions, highlightDriver }) {
   return (
     <div className="panel" style={{ padding: 16 }}>
       <svg viewBox="0 0 660 400" style={{ display: "block", width: "100%", height: "auto" }}>
+        {/* engineering-tool backdrop: faint gridlines + axis ticks with mono labels */}
+        <g aria-hidden="true">
+          {[0, 132, 264, 396, 528, 660].map((x) => (
+            <line key={`v${x}`} className="gridline" x1={x} y1={16} x2={x} y2={384} />
+          ))}
+          {[16, 108, 200, 292, 384].map((y) => (
+            <line key={`h${y}`} className="gridline" x1={8} y1={y} x2={652} y2={y} />
+          ))}
+          {[0, 132, 264, 396, 528, 660].map((x) => (
+            <text key={`vt${x}`} className="axis-label" x={x + 2} y={397}>{x}</text>
+          ))}
+          {[108, 200, 292].map((y) => (
+            <text key={`ht${y}`} className="axis-label" x={2} y={y - 3}>{400 - y}</text>
+          ))}
+          <text className="axis-label" x={594} y={12}>X / Y (px)</text>
+        </g>
         <path
           ref={pathRef}
           d={TRACK_PATH}
