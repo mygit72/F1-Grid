@@ -1,0 +1,26 @@
+# Keep the image lean and reproducible from what a clean clone has. Large,
+# regenerable caches and local-only dirs must never enter the build context.
+.git
+.venv
+venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+
+# Large derived caches (mirror .gitignore): never in the image.
+artifacts/fastf1_cache/
+artifacts/data/laps.parquet
+artifacts/data/laps.pkl
+artifacts/data/*.pkl
+artifacts/backtests/
+
+# Web app build inputs/outputs are not part of the API image.
+web/node_modules/
+web/dist/
+node_modules/
+dist/
+
+# Scratch/editor
+*.egg-info/
+.DS_Store
+.streamlit/secrets.toml

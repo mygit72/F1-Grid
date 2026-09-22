@@ -25,6 +25,7 @@ from app.data_loader import (  # noqa: E402
 )
 from f1grid import schema as S  # noqa: E402
 from f1grid.config import CONFIG  # noqa: E402
+from f1grid.runtime import is_deployed, DEPLOYED_REFUSAL  # noqa: E402
 from f1grid.model import strategy_meter as _meter  # noqa: E402
 from f1grid.model.montecarlo import monte_carlo_outcomes  # noqa: E402
 from f1grid.model.strategy_sim import compare_strategies, StintPlan  # noqa: E402
@@ -180,12 +181,22 @@ with tabs[0]:
             "A race that has already run is refused from the public record "
             "(use the publish CLI for the next upcoming race)."
         )
-        if cpub2.button("📌 Publish this prediction", width="stretch"):
+        if is_deployed():
+            # Deployment mode: writes go to ephemeral, publicly reachable
+            # container storage, so publishing is disabled here. It stays a local
+            # CLI + git action. Everything read-only above still works.
+            cpub2.button("📌 Publish this prediction", width="stretch",
+                         disabled=True, help=DEPLOYED_REFUSAL)
+            cpub2.caption("Publishing is disabled in deployment mode.")
+        elif cpub2.button("📌 Publish this prediction", width="stretch"):
             try:
+                meter = _meter.classify_from_artifact(
+                    results, load_laps_cached(), event, season, rnd)
                 path = save_prediction(
                     season, rnd, event, merged, data_cutoff=f"as of {season} R{rnd-1}",
                     rain_prob=rain, model_meta={"backend": pipe.race.backend,
                                                 "used_saved_models": used_saved},
+                    strategy_meter=meter,
                 )
                 st.success(f"Published (verified pre-race): `{Path(path).name}`")
             except RetroactivePredictionError as e:

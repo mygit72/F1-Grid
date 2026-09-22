@@ -62,6 +62,22 @@ lap cache and fastf1_cache are not.
    shows real data (the app reports `is_real_data: true` only when the parquet is
    present).
 
+## Deployment mode (required for any public API/app deploy)
+
+Set the environment variable `F1GRID_DEPLOYED=1` on every hosted deployment
+(API and Streamlit). In deployment mode the write actions are refused:
+
+- `POST /predictions/{season}/{round}/publish` and
+  `POST /predictions/{season}/{round}/score` return HTTP 403, and
+- the Streamlit "Publish this prediction" button is disabled with an explanation.
+
+This is deliberate: a container's storage is ephemeral (wiped on redeploy) and
+publicly reachable, so a prediction published there would be lost and
+unauthenticated. Publishing and scoring stay a LOCAL CLI + git action
+(`python -m f1grid.publish --next` / `--score`). Everything read-only
+(predictions, track record, strategy, scenario, manual grid) keeps working in
+deployment mode. Leave the variable unset locally.
+
 ## API on Railway or Render (FastAPI + uvicorn)
 
 The API entrypoint is `api.main:app`; start command:

@@ -14,6 +14,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from f1grid import schema as S
+from f1grid.runtime import is_deployed, DEPLOYED_REFUSAL
 from f1grid.model.montecarlo import monte_carlo_outcomes
 from f1grid.model.strategy_sim import compare_strategies, StintPlan
 from f1grid.store.predictions import save_prediction, RetroactivePredictionError
@@ -134,7 +135,13 @@ def publish_prediction(
     request for a race that has already run is refused here (HTTP 409) no matter
     how it is called. Pass backtest=true to store it in the separate, clearly
     labelled backtest archive that the public track record never reads.
+
+    In deployment mode this write action is refused (HTTP 403): a container's
+    storage is ephemeral and publicly reachable, so publishing stays a local CLI
+    + git action only.
     """
+    if is_deployed():
+        raise HTTPException(403, DEPLOYED_REFUSAL)
     state = get_state()
     race_feats = state.feats[
         (state.feats[S.SEASON] == season) & (state.feats[S.ROUND] == round_no)
@@ -167,7 +174,13 @@ def publish_prediction(
 
 @app.post("/predictions/{season}/{round_no}/score")
 def score_prediction(season: int, round_no: int):
-    """Grades the latest published prediction against the real result, if known."""
+    """Grades the latest published prediction against the real result, if known.
+
+    Refused in deployment mode (HTTP 403): scoring writes to the ephemeral
+    public scorecard and must stay a local CLI + git action.
+    """
+    if is_deployed():
+        raise HTTPException(403, DEPLOYED_REFUSAL)
     state = get_state()
     row = _score_race(season, round_no, state.results)
     if row is None:
