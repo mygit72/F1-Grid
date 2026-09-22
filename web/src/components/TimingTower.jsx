@@ -21,11 +21,13 @@ export default function TimingTower({ predictions, highlightDriver, onSelectDriv
   const maxWin = Math.max(...sorted.map((p) => p.win_prob ?? 0), 0.01);
 
   return (
-    <div className="panel scrollbar-thin" style={{ padding: 10, overflowY: "auto", maxHeight: 560 }}>
+    <div className="panel scrollbar-thin" data-testid="timing-tower" style={{ padding: 10, overflowY: "auto", maxHeight: 560 }}>
       <AnimatePresence initial={false}>
         {sorted.map((p) => (
           <motion.div
             key={p.driver}
+            data-testid="timing-row"
+            data-driver={p.driver}
             layout
             transition={{ type: "spring", stiffness: 420, damping: 34, mass: 0.9 }}
             initial={{ opacity: 0, y: -8 }}

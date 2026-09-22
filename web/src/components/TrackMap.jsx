@@ -45,7 +45,7 @@ export default function TrackMap({ predictions, highlightDriver }) {
 
   return (
     <div className="panel" style={{ padding: 16 }}>
-      <svg viewBox="0 0 660 400" width="100%" height="auto" style={{ display: "block" }}>
+      <svg viewBox="0 0 660 400" style={{ display: "block", width: "100%", height: "auto" }}>
         <path
           ref={pathRef}
           d={TRACK_PATH}
@@ -71,6 +71,9 @@ export default function TrackMap({ predictions, highlightDriver }) {
             return (
               <g key={p.driver}>
                 <motion.circle
+                  cx={point.x}
+                  cy={point.y}
+                  initial={{ cx: point.x, cy: point.y }}
                   animate={{ cx: point.x, cy: point.y }}
                   transition={{ type: "spring", stiffness: 120, damping: 20 }}
                   r={isHi ? 9 : 6}
@@ -80,6 +83,9 @@ export default function TrackMap({ predictions, highlightDriver }) {
                 />
                 {(i === 0 || isHi) && (
                   <motion.text
+                    x={point.x}
+                    y={point.y - 12}
+                    initial={{ x: point.x, y: point.y - 12 }}
                     animate={{ x: point.x, y: point.y - 12 }}
                     transition={{ type: "spring", stiffness: 120, damping: 20 }}
                     textAnchor="middle"

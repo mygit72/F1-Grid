@@ -14,7 +14,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from f1grid import schema as S
-from f1grid.runtime import is_deployed, DEPLOYED_REFUSAL
+from f1grid.runtime import is_deployed, DEPLOYED_REFUSAL, cors_allowed_origins
 from f1grid.model.montecarlo import monte_carlo_outcomes
 from f1grid.model.strategy_sim import compare_strategies, StintPlan
 from f1grid.store.predictions import save_prediction, RetroactivePredictionError
@@ -35,8 +35,13 @@ app = FastAPI(
     ),
     version="0.1.0",
 )
+# Allow only explicitly trusted origins (never a wildcard): the front-end origin
+# set via F1GRID_CORS_ORIGINS on a deployment, plus local-dev defaults.
 app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
+    CORSMiddleware,
+    allow_origins=cors_allowed_origins(),
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 

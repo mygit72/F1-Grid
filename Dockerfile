@@ -1,6 +1,6 @@
 # F1Grid API - inference-only service (reads pre-built artifacts committed to
 # the repo; does not run FastF1 ingestion itself).
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Deployment mode ON by default in the image: publish/score are refused, since a
 # container's storage is ephemeral and publicly reachable. Read-only endpoints

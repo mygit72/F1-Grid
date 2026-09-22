@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
 
+# Never let `npm ci`/`npm install` auto-download Playwright browsers; the
+# docker-test job downloads chromium explicitly where it is actually needed.
+env:
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -29,13 +34,107 @@ jobs:
           python -m py_compile app/main.py app/theme.py app/data_loader.py
           python -m py_compile api/main.py api/schemas.py api/state.py
 
-  docker-build:
+  # Real, repeatable Docker testing: build the image, run it in deployed mode on a
+  # non-default port, exercise every endpoint from OUTSIDE the container, prove
+  # non-root and $PORT handling, survive a stop/start, check CORS, then build the
+  # React app against the running container and render it headlessly with Playwright.
+  docker-test:
     runs-on: ubuntu-latest
     needs: test
     steps:
       - uses: actions/checkout@v4
-      - name: Build API image
-        run: docker build -t f1grid-api:ci .
+
+      - name: Build API image (--no-cache); report size and build time
+        run: |
+          start=$(date +%s)
+          docker build --no-cache -t f1grid-api:ci .
+          end=$(date +%s)
+          build_secs=$((end - start))
+          size_bytes=$(docker image inspect f1grid-api:ci --format '{{.Size}}')
+          size_mb=$(awk "BEGIN{printf \"%.1f\", ${size_bytes}/1048576}")
+          {
+            echo "### Docker image"
+            echo ""
+            echo "| metric | value |"
+            echo "| --- | --- |"
+            echo "| image | \`f1grid-api:ci\` |"
+            echo "| size | ${size_mb} MB |"
+            echo "| build time (--no-cache) | ${build_secs} s |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run container in deployed mode on non-default PORT 9123
+        run: |
+          docker run -d --name f1grid \
+            -e F1GRID_DEPLOYED=1 \
+            -e PORT=9123 \
+            -e F1GRID_CORS_ORIGINS="http://localhost:4173,https://allowed.example" \
+            -p 9123:9123 \
+            f1grid-api:ci
+
+      - name: Wait for readiness (timeout, not a fixed sleep)
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:9123/ >/dev/null 2>&1; then
+              echo "ready after ${i}s"; exit 0
+            fi
+            sleep 1
+          done
+          echo "container did not become ready within 60s"; docker logs f1grid; exit 1
+
+      - name: Prove the injected $PORT (9123) is served
+        run: |
+          curl -fsS http://localhost:9123/about >/dev/null
+          echo "API is serving on the injected PORT 9123"
+
+      - name: API endpoint checks (real data, saved models, strategy field, 403s, CORS)
+        run: bash scripts/container_api_checks.sh http://localhost:9123 https://allowed.example https://evil.example
+
+      - name: Confirm the container process is NOT root
+        run: |
+          uid=$(docker exec f1grid id -u)
+          echo "container uid=$uid"
+          if [ "$uid" = "0" ]; then echo "FAIL: container runs as root"; exit 1; fi
+          echo "PASS: non-root (uid=$uid)"
+
+      - name: Stop and start the container, then re-run every endpoint check
+        run: |
+          docker stop f1grid
+          docker start f1grid
+          ok=0
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:9123/ >/dev/null 2>&1; then echo "ready again after ${i}s"; ok=1; break; fi
+            sleep 1
+          done
+          if [ "$ok" != "1" ]; then echo "not ready after restart"; docker logs f1grid; exit 1; fi
+          bash scripts/container_api_checks.sh http://localhost:9123 https://allowed.example https://evil.example
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web/package-lock.json
+
+      - name: Build the React app with VITE_API_BASE pointing at the container
+        working-directory: web
+        run: |
+          npm ci
+          VITE_API_BASE=http://localhost:9123 npm run build
+
+      - name: Serve the built site and run the headless Playwright check
+        working-directory: web
+        run: |
+          npx playwright install --with-deps chromium
+          npx vite preview --port 4173 --host 127.0.0.1 > preview.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://localhost:4173/ >/dev/null 2>&1 && break; sleep 1; done
+          SITE_URL=http://localhost:4173 node tests/playwright_check.mjs
+
+      - name: Container logs (on failure)
+        if: failure()
+        run: docker logs f1grid || true
+
+      - name: Teardown
+        if: always()
+        run: docker rm -f f1grid || true
 
   web-build:
     runs-on: ubuntu-latest
@@ -49,7 +148,7 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - name: Install web dependencies
         working-directory: web
-        run: npm install
+        run: npm ci
       - name: Build web app
         working-directory: web
         run: npm run build

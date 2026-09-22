@@ -32,3 +32,30 @@ DEPLOYED_REFUSAL = (
 
 def is_deployed() -> bool:
     return os.environ.get(DEPLOYED_ENV_VAR, "").strip().lower() in _TRUTHY
+
+
+CORS_ENV_VAR = "F1GRID_CORS_ORIGINS"
+
+# Local development origins used when F1GRID_CORS_ORIGINS is not set. A deployment
+# sets the env var to exactly the front-end origin(s) it trusts (e.g. the Vercel
+# domain) plus localhost. We never use a "*" wildcard: the API is public and a
+# wildcard would let any site call it from a browser.
+_DEFAULT_CORS_ORIGINS = (
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+    "http://localhost:3000",
+)
+
+
+def cors_allowed_origins() -> list[str]:
+    """The exact list of browser origins allowed to call the API. Read from
+    F1GRID_CORS_ORIGINS (comma-separated) if set, else the local-dev defaults.
+    A literal "*" is rejected so a deploy can never silently open to everyone."""
+    raw = os.environ.get(CORS_ENV_VAR, "").strip()
+    if not raw:
+        return list(_DEFAULT_CORS_ORIGINS)
+    origins = [o.strip() for o in raw.split(",") if o.strip()]
+    origins = [o for o in origins if o != "*"]
+    return origins or list(_DEFAULT_CORS_ORIGINS)
