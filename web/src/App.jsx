@@ -1,16 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { api } from "./lib/api";
 import { parseModelCardFacts } from "./lib/facts";
 import BackgroundFX from "./components/BackgroundFX";
 import Hero from "./components/Hero";
-import Podium from "./components/Podium";
 import PredictionSkeleton from "./components/PredictionSkeleton";
-import TimingTower from "./components/TimingTower";
-import TrackMap from "./components/TrackMap";
-import StrategyGantt from "./components/StrategyGantt";
-import GridBuilder from "./components/GridBuilder";
-import GridComparison from "./components/GridComparison";
 import StrategyMeter from "./components/StrategyMeter";
+
+// Code-split the heavy, data-dependent components (these pull in framer-motion)
+// so they are NOT in the initial bundle. The hero paints from a tiny first chunk;
+// these load while the skeleton shows and the data request is in flight.
+const Podium = lazy(() => import("./components/Podium"));
+const TimingTower = lazy(() => import("./components/TimingTower"));
+const TrackMap = lazy(() => import("./components/TrackMap"));
+const StrategyGantt = lazy(() => import("./components/StrategyGantt"));
+const GridBuilder = lazy(() => import("./components/GridBuilder"));
+const GridComparison = lazy(() => import("./components/GridComparison"));
+
+const Fallback = () => <div className="skeleton" style={{ height: 220, borderRadius: 12 }} />;
 
 const NAV = [
   { id: "race", label: "Race Prediction" },
@@ -151,7 +157,7 @@ function RaceView() {
 
       <div>
         {prediction ? (
-          <>
+          <Suspense fallback={<PredictionSkeleton />}>
             <Podium predictions={prediction.predictions} />
             <StrategyMeter meter={prediction.strategy_meter} />
             <div className="race-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
@@ -162,7 +168,7 @@ function RaceView() {
               {prediction.event} / {prediction.used_real_grid ? "real grid given" : "predicted grid (forecast)"} /
               rain scenario {Math.round(prediction.rain_prob * 100)}%
             </p>
-          </>
+          </Suspense>
         ) : (
           <PredictionSkeleton />
         )}
@@ -188,14 +194,16 @@ function ManualGridView() {
 
   return (
     <div className="manual-grid" style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 20 }}>
-      <GridBuilder onPredict={handlePredict} loading={loading} />
-      {result ? (
-        <GridComparison yourGrid={result.your_grid} predictedFinish={result.predicted_finish} />
-      ) : (
-        <div className="panel glass" style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>
-          Build a grid and click predict to see your input next to the model's output.
-        </div>
-      )}
+      <Suspense fallback={<Fallback />}>
+        <GridBuilder onPredict={handlePredict} loading={loading} />
+        {result ? (
+          <GridComparison yourGrid={result.your_grid} predictedFinish={result.predicted_finish} />
+        ) : (
+          <div className="panel glass" style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>
+            Build a grid and click predict to see your input next to the model's output.
+          </div>
+        )}
+      </Suspense>
     </div>
   );
 }
@@ -228,8 +236,11 @@ function StrategyView() {
                onChange={(e) => setRain(Number(e.target.value))}
                style={{ width: "100%", marginTop: 6 }} />
       </div>
-      {results ? <StrategyGantt results={results} totalLaps={totalLaps} />
-               : <div className="skeleton" style={{ height: 220, borderRadius: 12 }} />}
+      {results ? (
+        <Suspense fallback={<Fallback />}>
+          <StrategyGantt results={results} totalLaps={totalLaps} />
+        </Suspense>
+      ) : <Fallback />}
     </div>
   );
 }
