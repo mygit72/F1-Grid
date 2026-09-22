@@ -25,6 +25,9 @@ artifacts/models/*.joblib
 *.egg-info/
 .DS_Store
 
+# Local Claude Code settings (personal, never part of the public repo).
+.claude/
+
 # React showcase app
 web/node_modules/
 web/dist/

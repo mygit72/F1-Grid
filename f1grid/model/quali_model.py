@@ -10,11 +10,16 @@ the full system is: features -> [quali model] -> predicted grid -> [race model]
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+import joblib
 import numpy as np
 import pandas as pd
 
 from f1grid.config import CONFIG
 from f1grid import schema as S
+from f1grid.model.order_model import _native_paths
 
 try:
     import xgboost as xgb
@@ -76,13 +81,31 @@ class QualiModel:
         return out
 
     def save(self, path):
-        import joblib
         joblib.dump({"model": self.model, "features": self.feature_columns,
                      "params": self.params}, path)
+        if self.backend == "xgboost" and self.model is not None:
+            booster_p, meta_p = _native_paths(path)
+            self.model.save_model(str(booster_p))
+            meta_p.write_text(json.dumps({
+                "features": list(self.feature_columns),
+                "params": self.params,
+                "backend": self.backend,
+                "model_kind": "XGBRanker",
+                "xgboost_version": xgb.__version__,
+            }, indent=2), encoding="utf-8")
 
     @classmethod
     def load(cls, path):
-        import joblib
+        booster_p, meta_p = _native_paths(path)
+        if _HAVE_XGB and booster_p.exists() and meta_p.exists():
+            meta = json.loads(meta_p.read_text(encoding="utf-8"))
+            m = cls(params=meta.get("params"))
+            model = xgb.XGBRanker(**(meta.get("params") or {}))
+            model.load_model(str(booster_p))
+            m.model = model
+            m.feature_columns = list(meta["features"])
+            m.backend = "xgboost"
+            return m
         blob = joblib.load(path)
         m = cls(params=blob["params"])
         m.model = blob["model"]

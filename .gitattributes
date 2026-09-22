@@ -6,3 +6,8 @@ artifacts/predictions/*.json -text
 *.parquet binary
 *.joblib binary
 *.pkl binary
+
+# Native XGBoost booster (JSON) + its metadata sidecar: keep bytes exact (LF), so
+# the serving models load identically on every platform.
+artifacts/models/*.xgb.json -text
+artifacts/models/*.meta.json -text

@@ -11,12 +11,25 @@ produced separately by the Monte Carlo layer (predict/race.py).
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import joblib
 import numpy as np
 import pandas as pd
 
 from f1grid.config import CONFIG
 from f1grid import schema as S
+
+
+def _native_paths(path):
+    """Sibling paths for the native XGBoost booster (JSON) and the plain-JSON
+    metadata (feature list + params). Given ``quali_model.joblib`` these are
+    ``quali_model.xgb.json`` and ``quali_model.meta.json``."""
+    path = Path(path)
+    stem = path.with_suffix("")
+    return (stem.with_name(stem.name + ".xgb.json"),
+            stem.with_name(stem.name + ".meta.json"))
 
 # Prefer XGBoost's learning-to-rank. Fall back to a sklearn regressor on the
 # inverted-position target if xgboost isn't installed (e.g. offline sandbox).
@@ -89,11 +102,36 @@ class OrderModel:
         return s.reindex(self.feature_columns).fillna(0.0).sort_values(ascending=False)
 
     def save(self, path):
+        # joblib blob: kept for backward compatibility and for the sklearn fallback.
         joblib.dump({"model": self.model, "features": self.feature_columns,
                      "params": self.params}, path)
+        # Native XGBoost booster (version-portable, no pickle) + plain-JSON metadata.
+        if self.backend == "xgboost" and self.model is not None:
+            booster_p, meta_p = _native_paths(path)
+            self.model.save_model(str(booster_p))
+            meta_p.write_text(json.dumps({
+                "features": list(self.feature_columns),
+                "params": self.params,
+                "backend": self.backend,
+                "model_kind": "XGBRanker",
+                "xgboost_version": xgb.__version__,
+            }, indent=2), encoding="utf-8")
 
     @classmethod
     def load(cls, path) -> "OrderModel":
+        # Prefer the native format: loading a booster from JSON does not unpickle a
+        # class from a possibly-different library version, so it is robust across
+        # versions and never emits XGBoost's cross-version warning.
+        booster_p, meta_p = _native_paths(path)
+        if _HAVE_XGB and booster_p.exists() and meta_p.exists():
+            meta = json.loads(meta_p.read_text(encoding="utf-8"))
+            m = cls(params=meta.get("params"))
+            model = xgb.XGBRanker(**(meta.get("params") or {}))
+            model.load_model(str(booster_p))
+            m.model = model
+            m.feature_columns = list(meta["features"])
+            m.backend = "xgboost"
+            return m
         blob = joblib.load(path)
         m = cls(params=blob["params"])
         m.model = blob["model"]

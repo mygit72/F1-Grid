@@ -1,0 +1,30 @@
+{
+  "features": [
+    "grid_position",
+    "form_avg_finish",
+    "form_avg_grid",
+    "form_avg_points",
+    "form_dnf_rate",
+    "team_points_to_date",
+    "driver_points_to_date",
+    "circuit_avg_finish",
+    "teammate_quali_gap",
+    "round_norm",
+    "prior_races_count"
+  ],
+  "params": {
+    "objective": "rank:pairwise",
+    "n_estimators": 400,
+    "max_depth": 5,
+    "learning_rate": 0.05,
+    "subsample": 0.85,
+    "colsample_bytree": 0.85,
+    "min_child_weight": 3,
+    "reg_lambda": 1.5,
+    "random_state": 42,
+    "n_jobs": -1
+  },
+  "backend": "xgboost",
+  "model_kind": "XGBRanker",
+  "xgboost_version": "3.3.0"
+}
