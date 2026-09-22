@@ -165,10 +165,13 @@ def main():
     ap.add_argument("--backtest", action="store_true",
                     help="Store to the separate backtest archive instead of the public record.")
     ap.add_argument("--repo", default=None,
-                    help="owner/name of the GitHub repo; enables appending a "
-                         "Result section to each graded race's release.")
+                    help="owner/name of the GitHub repo; enables the release "
+                         "provenance/notes on --next and the Result section on --score.")
+    ap.add_argument("--commit-push", action="store_true",
+                    help="After --next, run the commit + push + provenance + medal "
+                         "notes + track-record routine (publish_git.publish_commit_push).")
     ap.add_argument("--no-push", action="store_true",
-                    help="Regenerate and commit reports after scoring but do not push.")
+                    help="Commit but do not push (applies to --commit-push and --score).")
     ap.add_argument("--dry-run-release", action="store_true",
                     help="Render the updated release bodies without editing GitHub.")
     args = ap.parse_args()
@@ -176,7 +179,16 @@ def main():
     if not (args.next or args.score):
         ap.error("Pass --next and/or --score.")
     if args.next:
-        publish_next(season=args.season, rain_prob=args.rain_prob, backtest=args.backtest)
+        path = publish_next(season=args.season, rain_prob=args.rain_prob,
+                            backtest=args.backtest)
+        if path is not None and args.commit_push and not args.backtest:
+            from f1grid import publish_git as PG
+            from f1grid.reporting import README_PATH
+            res = PG.publish_commit_push(
+                path, repo=args.repo, readme_path=README_PATH,
+                push=not args.no_push, gh=None)
+            print(f"commit/push: status={res['status']} ok={res['ok']} "
+                  f"prediction_commit={res.get('prediction_commit')}")
     if args.score:
         results = load_results()
         scored_rows = score_published(results)
