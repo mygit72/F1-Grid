@@ -219,25 +219,36 @@ anyone can check the timing independently. To verify a prediction yourself:
    newer `schema_version: 3` files both verify with the same procedure, because
    the hash is taken over whatever fields the record actually contained.
 
-3. **Check it predates the race on GitHub.** Because the file is committed to a
-   public repo, the commit timestamp is independent evidence. Confirm the
-   prediction commit landed before `race_start_utc`:
+3. **Check it predates the race using third-party server timestamps, not the
+   commit date.** A git commit's committer date is set by the committer's own
+   machine and can be backdated, so **the commit date alone is not proof.** The
+   proof is timestamps recorded by servers we do not control. For every
+   published prediction, `TRACK_RECORD.md` and the sidecar in
+   `artifacts/provenance/<file>.provenance.json` record:
 
-   ```bash
-   git log -1 --format='%cI %H' -- artifacts/predictions/<file>.json
-   # or, against GitHub's own record of the commit:
-   gh api repos/<owner>/<repo>/commits/<sha> --jq '.commit.committer.date'
-   ```
+   - a **GitHub Release** (tag `pred-<season>-R<round>`) with the prediction file
+     attached and its content hash in the notes. GitHub stamps it server-side;
+     read the timestamps with
+     `gh api repos/<owner>/<repo>/releases/tags/pred-<season>-R<round> --jq '{created_at,published_at}'`.
+     `published_at` is when GitHub actually published the release (note GitHub
+     sets a release's `created_at` to the tagged commit's date, so prefer
+     `published_at` as the independent server time).
+   - a **Wayback Machine snapshot** of the raw prediction-file URL. Confirm it
+     with `curl -s 'https://archive.org/wayback/available?url=<raw-url>'`; the
+     `timestamp` field is archive.org's server-side record.
+   - the repo's **PushEvent** `created_at` from the events API as a supporting,
+     short-lived record (`gh api repos/<owner>/<repo>/events`).
 
-   Compare that timestamp to the `race_start_utc` field in the file. The store
-   (`store/predictions.py`) already refuses to write a public prediction whose
-   `made_at` is not strictly before the authoritative race start, so a
+   Each of these must fall before the `race_start_utc` in the file. The store
+   (`store/predictions.py`) additionally refuses to write a public prediction
+   whose `made_at` is not strictly before the authoritative race start, so a
    retroactive prediction can never enter this directory in the first place.
 
 4. **Read the running tally.** `TRACK_RECORD.md` is regenerated from the
-   immutable store plus the post-race scorecard (`f1grid/reporting.py`). It is a
-   pure function of those files, so regenerating it without new data produces a
-   byte-for-byte identical file.
+   immutable store, the post-race scorecard, and the provenance sidecars
+   (`f1grid/reporting.py`), and lists the release and snapshot links for each
+   prediction. It is a pure function of those files, so regenerating it without
+   new data produces a byte-for-byte identical file.
 
 ## Deployment
 

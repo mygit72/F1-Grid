@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "artifacts" / "data"          # cached raw + feature parquet
 MODEL_DIR = ROOT / "artifacts" / "models"        # serialized models
 PRED_DIR = ROOT / "artifacts" / "predictions"    # PUBLIC immutable pre-race predictions
+PROV_DIR = ROOT / "artifacts" / "provenance"     # third-party proof sidecars (release/wayback/push)
 BACKTEST_DIR = ROOT / "artifacts" / "backtests"  # retroactive/backtest predictions (NEVER public)
 EVAL_DIR = ROOT / "artifacts" / "eval"           # eval reports / plots
 FASTF1_CACHE = ROOT / "artifacts" / "fastf1_cache"
@@ -18,7 +19,7 @@ FASTF1_CACHE = ROOT / "artifacts" / "fastf1_cache"
 # pre-race; it is the single source of truth a caller cannot forge.
 SCHEDULE_PARQUET = DATA_DIR / "schedule.parquet"
 
-for _p in (DATA_DIR, MODEL_DIR, PRED_DIR, BACKTEST_DIR, EVAL_DIR, FASTF1_CACHE):
+for _p in (DATA_DIR, MODEL_DIR, PRED_DIR, PROV_DIR, BACKTEST_DIR, EVAL_DIR, FASTF1_CACHE):
     _p.mkdir(parents=True, exist_ok=True)
 
 

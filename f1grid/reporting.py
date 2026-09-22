@@ -15,9 +15,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from f1grid.config import ROOT, PRED_DIR
+from f1grid.config import ROOT, PRED_DIR, PROV_DIR
 from f1grid.score.scorer import track_record, SCORECARD
 from f1grid.store.predictions import load_predictions
+from f1grid.provenance import read_provenance
 
 TRACK_RECORD_PATH = ROOT / "TRACK_RECORD.md"
 
@@ -77,18 +78,73 @@ def _pending_table(sc: Path, pred_dir: Path) -> list[str]:
     return lines
 
 
+def _provenance_section(pred_dir: Path, prov_dir: Path) -> list[str]:
+    """Third-party, server-side proof links for each published prediction.
+
+    A commit date is set locally and can be forged, so it is not proof. These
+    links (GitHub Release created_at, Wayback snapshot timestamp, PushEvent) are
+    timestamps a third party controls. Rendered from the provenance sidecars.
+    """
+    recs = sorted(load_predictions(pred_dir=pred_dir),
+                  key=lambda r: (int(r["season"]), int(r["round"]), r["made_at_utc"]))
+    lines = ["## Verifiable provenance (third-party server timestamps)", "",
+             "The commit date alone is NOT proof: it is set by the committer's",
+             "machine. Proof is the server-side timestamps below, each of which",
+             "must predate the race start.", ""]
+    any_rows = False
+    for rec in recs:
+        path = rec.get("_path")
+        if not path:
+            continue
+        data = read_provenance(Path(path), prov_dir)
+        if not data:
+            continue
+        any_rows = True
+        rel = data.get("release") or {}
+        wb = data.get("wayback") or {}
+        lines.append(f"### {rec['season']} R{rec['round']} {rec['event']}")
+        lines.append("")
+        lines.append(f"- Prediction file: `{data.get('prediction_file')}` "
+                     f"(content_hash `{data.get('content_hash')}`)")
+        lines.append(f"- Race start (UTC): {data.get('race_start_utc')}")
+        if rel:
+            lines.append(f"- GitHub Release: {rel.get('url')} "
+                         f"(created_at {rel.get('created_at')}, "
+                         f"published_at {rel.get('published_at')})")
+        elif data.get("release_error"):
+            lines.append(f"- GitHub Release: NOT AVAILABLE ({data['release_error']})")
+        if wb:
+            lines.append(f"- Wayback snapshot: {wb.get('snapshot_url')} "
+                         f"(timestamp {wb.get('timestamp')})")
+        elif data.get("wayback_error"):
+            lines.append(f"- Wayback snapshot: NOT AVAILABLE ({data['wayback_error']})")
+        if data.get("push_event_created_at"):
+            lines.append(f"- PushEvent created_at: {data['push_event_created_at']} "
+                         f"(supporting, short-lived)")
+        lines.append(f"- Commit (date is NOT proof): {data.get('commit_sha')}")
+        lines.append("")
+    if not any_rows:
+        lines.append("No provenance records yet.")
+        lines.append("")
+    return lines
+
+
 def render_track_record(scorecard: Path = SCORECARD,
-                        pred_dir: Path = PRED_DIR) -> str:
+                        pred_dir: Path = PRED_DIR,
+                        prov_dir: Path = PROV_DIR) -> str:
     lines = list(_HEADER)
     lines += _scored_table(scorecard)
     lines += _pending_table(scorecard, pred_dir)
+    lines += _provenance_section(pred_dir, prov_dir)
     return "\n".join(lines).rstrip("\n") + "\n"
 
 
 def write_track_record(path: Path = TRACK_RECORD_PATH,
                        scorecard: Path = SCORECARD,
-                       pred_dir: Path = PRED_DIR) -> Path:
-    path.write_text(render_track_record(scorecard, pred_dir), encoding="utf-8")
+                       pred_dir: Path = PRED_DIR,
+                       prov_dir: Path = PROV_DIR) -> Path:
+    path.write_text(render_track_record(scorecard, pred_dir, prov_dir),
+                    encoding="utf-8")
     return path
 
 

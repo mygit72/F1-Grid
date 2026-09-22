@@ -20,8 +20,9 @@ import subprocess
 from pathlib import Path
 from typing import Callable
 
-from f1grid.config import ROOT
+from f1grid.config import ROOT, PROV_DIR
 from f1grid.reporting import write_track_record, TRACK_RECORD_PATH
+from f1grid import provenance as prov
 
 # A pusher takes (remote, branch, cwd) and returns (ok, output).
 Pusher = Callable[[str, str, Path], "tuple[bool, str]"]
@@ -73,17 +74,29 @@ def _default_push(remote: str, branch: str, cwd: Path) -> "tuple[bool, str]":
 def publish_commit_push(
     pred_path: Path,
     *,
+    repo: str | None = None,
     remote: str = "origin",
     branch: str | None = None,
     push: bool = True,
     pusher: Pusher | None = None,
     cwd: Path = ROOT,
     track_record_path: Path = TRACK_RECORD_PATH,
+    collect_provenance: bool = True,
+    prov_dir: Path = PROV_DIR,
+    gh: str | None = None,
+    do_wayback: bool = True,
 ) -> dict:
-    """Commit a freshly published prediction file and its track record.
+    """Commit a freshly published prediction file, gather third-party proof, and
+    commit the updated track record.
 
-    Returns a result dict with an `ok` flag. On any push failure `ok` is False
-    and `status` says which push failed; the routine does not pretend success.
+    Flow: commit ONLY the prediction file, push, then (once it is on GitHub)
+    collect server-side provenance (GitHub Release, Wayback snapshot, PushEvent)
+    into a sidecar, regenerate TRACK_RECORD.md with the proof links, and commit +
+    push the track record and sidecar together.
+
+    Returns a result dict with an `ok` flag. On any push failure `ok` is False and
+    `status` says which push failed; the routine never pretends success. The
+    immutable prediction file is never modified: proof lives in a sidecar.
     """
     pred_path = Path(pred_path)
     rec = json.loads(pred_path.read_text(encoding="utf-8"))
@@ -96,6 +109,7 @@ def publish_commit_push(
         "content_hash": rec.get("content_hash"),
         "prediction_commit": None,
         "track_record_commit": None,
+        "provenance": None,
         "pushes": [],
     }
 
@@ -111,19 +125,28 @@ def publish_commit_push(
             result["status"] = "push_failed_after_prediction_commit"
             return result
 
-    # 3. regenerate TRACK_RECORD.md and commit it.
+    # 3. collect third-party, server-side proof now that the file is on GitHub.
+    committed_paths = [track_record_path]
+    if collect_provenance and repo:
+        data = prov.collect_provenance(
+            repo, pred_path, rec, result["prediction_commit"],
+            branch=branch, gh=gh, do_wayback=do_wayback, prov_dir=prov_dir)
+        result["provenance"] = data
+        committed_paths.append(prov.sidecar_path(pred_path, prov_dir))
+
+    # 4. regenerate TRACK_RECORD.md (with proof links) and commit it + sidecar.
     write_track_record(track_record_path)
-    # If nothing changed, git commit exits non-zero; treat "nothing to commit"
-    # as a no-op rather than an error.
-    add = _git(["add", "--", str(track_record_path)], cwd)
-    _require(add, f"git add {track_record_path}")
-    diff = _git(["diff", "--cached", "--quiet", "--", str(track_record_path)], cwd)
+    spec = [str(p) for p in committed_paths]
+    for s in spec:
+        _require(_git(["add", "--", s], cwd), f"git add {s}")
+    diff = _git(["diff", "--cached", "--quiet", "--", *spec], cwd)
     if diff.returncode != 0:  # there is a staged change to commit
         result["track_record_commit"] = commit_only(
-            [track_record_path],
-            f"Update track record after {rec['season']} R{rec['round']} {rec['event']}",
+            committed_paths,
+            f"Update track record and provenance after "
+            f"{rec['season']} R{rec['round']} {rec['event']}",
             cwd)
-        # 4. push the track record.
+        # 5. push the track record + sidecar.
         if push:
             ok, out = do_push(remote, branch, cwd)
             result["pushes"].append({"what": "track_record", "ok": ok, "output": out})
