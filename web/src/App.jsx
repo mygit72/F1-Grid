@@ -16,9 +16,36 @@ const NAV = [
 export default function App() {
   const [tab, setTab] = useState("race");
   const [about, setAbout] = useState(null);
+  // "connecting" until the first API call returns. On a free-tier host the
+  // instance sleeps after inactivity, so the first request can take up to a
+  // minute (a cold start); we show a clear waking-up banner instead of an
+  // error or a blank table, then retry until it answers.
+  const [serverStatus, setServerStatus] = useState("connecting");
+  const [slow, setSlow] = useState(false);
 
   useEffect(() => {
-    api.about().then(setAbout).catch(() => {});
+    let cancelled = false;
+    const slowTimer = setTimeout(() => !cancelled && setSlow(true), 2500);
+
+    async function connect() {
+      // Retry the initial handshake a few times so a cold start resolves to a
+      // successful load rather than a one-shot error.
+      for (let attempt = 0; attempt < 12 && !cancelled; attempt++) {
+        try {
+          const info = await api.about();
+          if (cancelled) return;
+          setAbout(info);
+          setServerStatus("ready");
+          setSlow(false);
+          return;
+        } catch (e) {
+          await new Promise((r) => setTimeout(r, 5000));
+        }
+      }
+      if (!cancelled) setServerStatus("error");
+    }
+    connect();
+    return () => { cancelled = true; clearTimeout(slowTimer); };
   }, []);
 
   return (
@@ -28,6 +55,34 @@ export default function App() {
           <span className="dot" /> F1GRID · LIVE PREDICTION ENGINE
         </div>
         <h1 className="display-title">Race weekend, predicted honestly.</h1>
+        {serverStatus === "connecting" && slow && (
+          <div
+            data-testid="waking-banner"
+            style={{
+              marginTop: 10, padding: "8px 12px", borderRadius: 6,
+              background: "rgba(52,152,219,0.12)",
+              border: "1px solid rgba(52,152,219,0.35)",
+              color: "var(--telemetry)", fontSize: "0.8rem", maxWidth: 640,
+            }}
+          >
+            Waking up the server. The free-tier API sleeps after inactivity, so
+            the first request can take up to a minute. Hang tight, retrying...
+          </div>
+        )}
+        {serverStatus === "error" && (
+          <div
+            data-testid="server-error-banner"
+            style={{
+              marginTop: 10, padding: "8px 12px", borderRadius: 6,
+              background: "rgba(224,165,46,0.12)",
+              border: "1px solid rgba(224,165,46,0.35)",
+              color: "var(--warn)", fontSize: "0.8rem", maxWidth: 640,
+            }}
+          >
+            Could not reach the API after several tries. It may still be waking
+            up; reload the page in a moment.
+          </div>
+        )}
         {about && !about.is_real_data && (
           <div
             style={{
