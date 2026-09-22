@@ -15,10 +15,12 @@ services:
       # work. The container also defaults F1GRID_DEPLOYED=1, this makes it explicit.
       - key: F1GRID_DEPLOYED
         value: "1"
-      # Exact browser origins allowed by CORS (never a wildcard). Set this in the
-      # Render dashboard to the Vercel site URL plus localhost once Vercel is live,
-      # e.g. "https://f1grid.vercel.app,http://localhost:5173". sync: false keeps it
-      # a dashboard-managed secret rather than a value committed here.
+      # Exact browser origins allowed by CORS (never a wildcard): localhost for dev.
       - key: F1GRID_CORS_ORIGINS
-        sync: false
+        value: "http://localhost:5173,http://127.0.0.1:5173"
+      # Regex allowing this Vercel project's production + preview domains with one
+      # rule (unrelated origins are still rejected). Matches f1grid01.vercel.app and
+      # f1grid01-<preview>.vercel.app, not evil.vercel.app or f1grid01.evil.com.
+      - key: F1GRID_CORS_ORIGIN_REGEX
+        value: '^https://f1grid01(-[a-z0-9-]+)?\.vercel\.app$'
     # Render injects $PORT and the Dockerfile CMD binds to it (uvicorn --port $PORT).
