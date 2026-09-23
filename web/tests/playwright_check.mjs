@@ -21,13 +21,15 @@ page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
 
 try {
   console.log("Loading " + SITE);
-  await page.goto(SITE, { waitUntil: "networkidle", timeout: 30000 });
+  // Wait on concrete elements, not networkidle: the app polls the API during a
+  // cold start and animates continuously, so the network is rarely fully idle.
+  await page.goto(SITE, { waitUntil: "domcontentloaded", timeout: 60000 });
 
   // The header must render.
   await page.waitForSelector("h1.display-title", { timeout: 15000 });
 
-  // Real predictions must populate the timing tower.
-  await page.waitForSelector('[data-testid="timing-row"]', { timeout: 20000 });
+  // Real predictions must populate the timing tower (allow for an API cold start).
+  await page.waitForSelector('[data-testid="timing-row"]', { timeout: 90000 });
   const rows = await page.locator('[data-testid="timing-row"]').count();
   if (rows < MIN_ROWS) fail(`only ${rows} timing rows rendered (expected >= ${MIN_ROWS})`);
 
