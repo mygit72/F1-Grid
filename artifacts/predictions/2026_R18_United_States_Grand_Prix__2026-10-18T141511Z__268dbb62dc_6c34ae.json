@@ -1,0 +1,218 @@
+{
+  "made_at_utc": "2026-10-18T14:15:11Z",
+  "race_start_utc": "2026-10-25T20:00:00Z",
+  "quali_start_utc": "2026-10-24T21:00:00Z",
+  "is_pre_race": true,
+  "pre_qualifying": true,
+  "is_backtest": false,
+  "data_cutoff": "as of 2026 R17",
+  "season": 2026,
+  "round": 18,
+  "event": "United States Grand Prix",
+  "rain_prob": 0.0,
+  "model_meta": {
+    "backend": "xgboost",
+    "trained_races": 169
+  },
+  "prediction": [
+    {
+      "driver": "VER",
+      "team": "Red Bull",
+      "predicted_position": 1,
+      "win_prob": 0.219,
+      "podium_prob": 0.443,
+      "points_prob": 0.7103333333333333
+    },
+    {
+      "driver": "ANT",
+      "team": "Mercedes",
+      "predicted_position": 2,
+      "win_prob": 0.18033333333333335,
+      "podium_prob": 0.45300000000000007,
+      "points_prob": 0.847
+    },
+    {
+      "driver": "NOR",
+      "team": "McLaren",
+      "predicted_position": 3,
+      "win_prob": 0.11066666666666666,
+      "podium_prob": 0.2916666666666667,
+      "points_prob": 0.6466666666666666
+    },
+    {
+      "driver": "LEC",
+      "team": "Ferrari",
+      "predicted_position": 4,
+      "win_prob": 0.085,
+      "podium_prob": 0.25766666666666665,
+      "points_prob": 0.6523333333333334
+    },
+    {
+      "driver": "PIA",
+      "team": "McLaren",
+      "predicted_position": 5,
+      "win_prob": 0.07766666666666666,
+      "podium_prob": 0.22366666666666665,
+      "points_prob": 0.6266666666666666
+    },
+    {
+      "driver": "HAM",
+      "team": "Ferrari",
+      "predicted_position": 6,
+      "win_prob": 0.06333333333333334,
+      "podium_prob": 0.22233333333333333,
+      "points_prob": 0.703
+    },
+    {
+      "driver": "RUS",
+      "team": "Mercedes",
+      "predicted_position": 7,
+      "win_prob": 0.05,
+      "podium_prob": 0.18333333333333335,
+      "points_prob": 0.6006666666666668
+    },
+    {
+      "driver": "LAW",
+      "team": "RB F1 Team",
+      "predicted_position": 8,
+      "win_prob": 0.03933333333333333,
+      "podium_prob": 0.15933333333333333,
+      "points_prob": 0.6019999999999999
+    },
+    {
+      "driver": "HAD",
+      "team": "Red Bull",
+      "predicted_position": 9,
+      "win_prob": 0.030666666666666665,
+      "podium_prob": 0.123,
+      "points_prob": 0.5083333333333333
+    },
+    {
+      "driver": "HUL",
+      "team": "Audi",
+      "predicted_position": 10,
+      "win_prob": 0.025333333333333333,
+      "podium_prob": 0.08766666666666667,
+      "points_prob": 0.42833333333333334
+    },
+    {
+      "driver": "BEA",
+      "team": "Haas F1 Team",
+      "predicted_position": 11,
+      "win_prob": 0.013333333333333334,
+      "podium_prob": 0.067,
+      "points_prob": 0.379
+    },
+    {
+      "driver": "COL",
+      "team": "Alpine F1 Team",
+      "predicted_position": 12,
+      "win_prob": 0.016,
+      "podium_prob": 0.063,
+      "points_prob": 0.41200000000000003
+    },
+    {
+      "driver": "OCO",
+      "team": "Haas F1 Team",
+      "predicted_position": 13,
+      "win_prob": 0.017666666666666667,
+      "podium_prob": 0.074,
+      "points_prob": 0.43899999999999995
+    },
+    {
+      "driver": "GAS",
+      "team": "Alpine F1 Team",
+      "predicted_position": 14,
+      "win_prob": 0.014333333333333333,
+      "podium_prob": 0.069,
+      "points_prob": 0.3993333333333333
+    },
+    {
+      "driver": "LIN",
+      "team": "RB F1 Team",
+      "predicted_position": 15,
+      "win_prob": 0.014333333333333333,
+      "podium_prob": 0.066,
+      "points_prob": 0.392
+    },
+    {
+      "driver": "BOR",
+      "team": "Audi",
+      "predicted_position": 16,
+      "win_prob": 0.009,
+      "podium_prob": 0.051000000000000004,
+      "points_prob": 0.3446666666666667
+    },
+    {
+      "driver": "ALO",
+      "team": "Aston Martin",
+      "predicted_position": 17,
+      "win_prob": 0.007,
+      "podium_prob": 0.03066666666666667,
+      "points_prob": 0.2346666666666667
+    },
+    {
+      "driver": "SAI",
+      "team": "Williams",
+      "predicted_position": 18,
+      "win_prob": 0.009,
+      "podium_prob": 0.04133333333333333,
+      "points_prob": 0.3063333333333333
+    },
+    {
+      "driver": "PER",
+      "team": "Cadillac F1 Team",
+      "predicted_position": 19,
+      "win_prob": 0.009666666666666667,
+      "podium_prob": 0.03933333333333333,
+      "points_prob": 0.2663333333333333
+    },
+    {
+      "driver": "ALB",
+      "team": "Williams",
+      "predicted_position": 20,
+      "win_prob": 0.0036666666666666666,
+      "podium_prob": 0.020666666666666667,
+      "points_prob": 0.191
+    },
+    {
+      "driver": "BOT",
+      "team": "Cadillac F1 Team",
+      "predicted_position": 21,
+      "win_prob": 0.0026666666666666666,
+      "podium_prob": 0.019333333333333334,
+      "points_prob": 0.182
+    },
+    {
+      "driver": "STR",
+      "team": "Aston Martin",
+      "predicted_position": 22,
+      "win_prob": 0.002,
+      "podium_prob": 0.013999999999999999,
+      "points_prob": 0.12833333333333333
+    }
+  ],
+  "schema_version": 3,
+  "strategy_meter": {
+    "label": "Strategy complexity",
+    "is_confidence": false,
+    "state": "ok",
+    "level": "Low",
+    "score": 0.4857,
+    "reason": "grid-to-finish moves average 4.1 places; pit-stop counts vary by 0.52 (stdev); safety cars in 25% of prior races (from 6 prior race(s) at this circuit)",
+    "signals": {
+      "n_prior_races": 6,
+      "grid_finish_divergence": 4.116666666666666,
+      "pit_stop_spread": 0.5210913176552654,
+      "sc_frequency": 0.25,
+      "n_races_with_laps": 4
+    },
+    "components_used": [
+      "divergence_norm",
+      "pit_spread_norm",
+      "sc_norm"
+    ]
+  },
+  "content_hash": "268dbb62dc",
+  "nonce": "6c34ae"
+}
