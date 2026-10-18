@@ -7,13 +7,15 @@ edit this file by hand: run the publish/score routine to regenerate it.
 
 ## Scored races
 
-No races have been scored yet.
+| season | round | event | made_at_utc | spearman | top1_acc | podium_acc | mae_pos | baseline_spearman | beat_baseline | cum_top1 | cum_podium | cum_beat_baseline |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026 | 15 | Azerbaijan Grand Prix | 2026-09-21T11:35:07Z | 0.5054 | 0.0 | 0.3333 | 5.333 | 0.5755 | 0.0 | 0.0 | 0.333 | 0.0 |
 
 ## Published, awaiting result
 
 | season | round | event | made_at_utc | race_start_utc | is_pre_race | content_hash |
 | --- | --- | --- | --- | --- | --- | --- |
-| 2026 | 15 | Azerbaijan Grand Prix | 2026-09-21T11:35:07Z | 2026-09-26T11:00:00Z | True | 74c95ccf0d |
+| 2026 | 18 | United States Grand Prix | 2026-10-18T14:15:11Z | 2026-10-25T20:00:00Z | True | 268dbb62dc |
 
 ## Verifiable provenance (third-party server timestamps)
 

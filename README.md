@@ -84,9 +84,10 @@ every publish and score; do not edit by hand.
 
 | Race | Predicted podium | Actual podium | Podium hits | Beat baseline | Links |
 | --- | --- | --- | --- | --- | --- |
-| 2026 R15 Azerbaijan Grand Prix | 🥇 ANT 🥈 RUS 🥉 NOR | pending | pending | pending | [release](https://github.com/mygit72/F1-Grid/releases/tag/pred-2026-R15) [wayback](http://web.archive.org/web/20260922105143/https://raw.githubusercontent.com/mygit72/F1-Grid/main/artifacts/predictions/2026_R15_Azerbaijan_Grand_Prix__2026-09-21T113507Z__74c95ccf0d_77fc5a.json) |
+| 2026 R15 Azerbaijan Grand Prix | 🥇 ANT 🥈 RUS 🥉 NOR | 🥇 RUS 🥈 VER 🥉 HAD | 1/3 | NO | [release](https://github.com/mygit72/F1-Grid/releases/tag/pred-2026-R15) [wayback](http://web.archive.org/web/20260922105143/https://raw.githubusercontent.com/mygit72/F1-Grid/main/artifacts/predictions/2026_R15_Azerbaijan_Grand_Prix__2026-09-21T113507Z__74c95ccf0d_77fc5a.json) |
+| 2026 R18 United States Grand Prix | 🥇 VER 🥈 ANT 🥉 NOR | pending | pending | pending | - |
 
-Summary: 0 race(s) graded, 0 podium pick(s) correct across them, baseline beaten in 0 of 0 graded race(s).
+Summary: 1 race(s) graded, 1 podium pick(s) correct across them, baseline beaten in 0 of 1 graded race(s).
 <!-- F1GRID:TRACKRECORD:END -->
 
 ## Architecture
