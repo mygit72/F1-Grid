@@ -30,3 +30,12 @@ must predate the race start.
 - GitHub Release: https://github.com/mygit72/F1-Grid/releases/tag/pred-2026-R15 (created_at 2026-09-22T09:35:50Z, published_at 2026-09-22T10:50:56Z)
 - Wayback snapshot: http://web.archive.org/web/20260922105143/https://raw.githubusercontent.com/mygit72/F1-Grid/main/artifacts/predictions/2026_R15_Azerbaijan_Grand_Prix__2026-09-21T113507Z__74c95ccf0d_77fc5a.json (timestamp 2026-09-22T10:51:43Z)
 - Commit (date is NOT proof): d072de2c5e3226cc127180f48df46671f62053a2
+
+### 2026 R18 United States Grand Prix
+
+- Prediction file: `2026_R18_United_States_Grand_Prix__2026-10-18T141511Z__268dbb62dc_6c34ae.json` (content_hash `268dbb62dc`)
+- Race start (UTC): 2026-10-25T20:00:00Z
+- GitHub Release: https://github.com/mygit72/F1-Grid/releases/tag/pred-2026-R18 (created_at 2026-10-18T14:25:50Z, published_at 2026-10-18T14:25:55Z)
+- Wayback snapshot: http://web.archive.org/web/20261018142641/https://raw.githubusercontent.com/mygit72/F1-Grid/main/artifacts/predictions/2026_R18_United_States_Grand_Prix__2026-10-18T141511Z__268dbb62dc_6c34ae.json (timestamp 2026-10-18T14:26:41Z)
+- PushEvent created_at: 2026-09-22T22:41:08Z (supporting, short-lived)
+- Commit (date is NOT proof): 3635315af13356298a531f484c20b8b0a5c8104c
