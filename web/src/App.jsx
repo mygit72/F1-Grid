@@ -11,6 +11,7 @@ const TrackMap = lazy(() => import("./components/TrackMap"));
 const StrategyGantt = lazy(() => import("./components/StrategyGantt"));
 const GridBuilder = lazy(() => import("./components/GridBuilder"));
 const GridComparison = lazy(() => import("./components/GridComparison"));
+const DriverLineup = lazy(() => import("./components/DriverLineup"));
 
 const Fallback = () => <div className="skeleton" style={{ height: 220, borderRadius: 14 }} />;
 
@@ -18,10 +19,12 @@ const NAV = [
   { id: "race", number: "01", label: "Race forecast", note: "PREDICT" },
   { id: "manual", number: "02", label: "Grid lab", note: "COMPARE" },
   { id: "strategy", number: "03", label: "Tyre strategy", note: "SIMULATE" },
+  { id: "drivers", number: "04", label: "Driver lineup", note: "EXPLORE" },
 ];
 
 export default function App() {
   const [tab, setTab] = useState("race");
+  const [focusedDriver, setFocusedDriver] = useState(null);
   const [about, setAbout] = useState(null);
   const [serverStatus, setServerStatus] = useState("connecting");
   const [slow, setSlow] = useState(false);
@@ -50,10 +53,14 @@ export default function App() {
 
   const facts = useMemo(() => parseModelCardFacts(about?.model_card), [about]);
   const currentNav = NAV.find((item) => item.id === tab);
+  const openDriverLineup = (driverCode = null) => {
+    setFocusedDriver(driverCode);
+    setTab("drivers");
+  };
 
   return (
     <div className="app-shell">
-      <Hero facts={facts} />
+      <Hero facts={facts} onOpenDrivers={() => openDriverLineup()} />
       <main className="wrap">
         {serverStatus === "connecting" && slow && (
           <div className="banner banner-wake" data-testid="waking-banner">
@@ -73,11 +80,11 @@ export default function App() {
           <div className="workspace-heading__copy">
             <div className="eyebrow"><span className="eyebrow-index">{currentNav?.number || "01"}</span> RACE CONTROL</div>
             <h2>{currentNav?.label || "Race forecast"}</h2>
-            <p>{tab === "race" ? "Build a race picture from the model's expected finish and driver probabilities." : tab === "manual" ? "Set a hypothetical starting order and compare it with the predicted finish." : "Explore how rain changes tyre choices and race time."}</p>
+            <p>{tab === "race" ? "Build a race picture from the model's expected finish and driver probabilities." : tab === "manual" ? "Set a hypothetical starting order and compare it with the predicted finish." : tab === "strategy" ? "Explore how rain changes tyre choices and race time." : "Meet all 22 drivers with their race numbers, teams, portraits, and nationality."}</p>
           </div>
           <nav className="nav-pills" aria-label="Prediction tools" role="tablist">
             {NAV.map((item) => (
-              <button key={item.id} type="button" role="tab" aria-selected={tab === item.id} className="nav-tab" onClick={() => setTab(item.id)}>
+              <button key={item.id} type="button" role="tab" aria-selected={tab === item.id} className="nav-tab" onClick={() => { setFocusedDriver(null); setTab(item.id); }}>
                 <span className="nav-tab__number">{item.number}</span>
                 <span className="nav-tab__label">{item.label}</span>
                 <span className="nav-tab__note">{item.note}</span>
@@ -86,21 +93,22 @@ export default function App() {
           </nav>
         </section>
 
-        {tab === "race" && <RaceView />}
+        {tab === "race" && <RaceView onOpenDriver={openDriverLineup} />}
         {tab === "manual" && <ManualGridView />}
         {tab === "strategy" && <StrategyView />}
+        {tab === "drivers" && <Suspense fallback={<Fallback />}><DriverLineup initialDriver={focusedDriver} /></Suspense>}
 
         <footer className="disclaimer">
           <span className="disclaimer__label">About the model</span>
           Predictions use a leakage-free, walk-forward statistical pipeline, published before each race and graded afterward. The model is for race analysis, not betting advice.
-          <a href="https://www.formula1.com/en/drivers" target="_blank" rel="noreferrer">Driver portraits and profiles via Formula 1 ↗</a>
+          <span className="disclaimer__credit">Driver portraits are shown in F1Grid; photo source: Formula 1 media.</span>
         </footer>
       </main>
     </div>
   );
 }
 
-function RaceView() {
+function RaceView({ onOpenDriver }) {
   const [races, setRaces] = useState([]);
   const [season, setSeason] = useState(null);
   const [round, setRound] = useState(null);
@@ -170,7 +178,7 @@ function RaceView() {
 
           {prediction ? (
             <Suspense fallback={<PredictionSkeleton />}>
-              <Podium predictions={prediction.predictions} season={prediction.season} />
+              <Podium predictions={prediction.predictions} season={prediction.season} onSelectDriver={onOpenDriver} />
               <StrategyMeter meter={prediction.strategy_meter} />
               <div className="analysis-heading"><div><span>01</span><div><strong>Race analysis</strong><small>Expected order and probability view</small></div></div><span>{prediction.predictions.length} DRIVERS</span></div>
               <div className="analysis-grid">

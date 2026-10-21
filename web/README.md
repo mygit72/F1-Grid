@@ -44,12 +44,13 @@ VITE_API_BASE=https://your-api.up.railway.app npm run build
 ## What's deliberately NOT here
 
 - **No F1 footage, team logos, or official broadcast graphics.** Driver
-  portraits are remotely loaded from Formula 1's media CDN and linked to the
-  official driver directory. Team colorways are used as data labels. The track
-  map is an invented generic circuit shape, not any real track's geometry.
+  portraits are shown in F1Grid's own driver directory and loaded from Formula
+  1's media CDN. Team colorways are used as data labels. The track map is an
+  invented generic circuit shape, not any real track's geometry.
 - **No broadcast footage or synthetic driver likenesses.** The interface uses
   the licensed Formula 1 profile portraits noted in `ATTRIBUTIONS.md`; all
-  other motorsport graphics and motion are built in the project.
+  other motorsport graphics and motion, including the stylized Ferrari red and
+  white SVG car, are built in the project.
 
 ## Components
 

@@ -32,39 +32,38 @@ const TEAM_ALIASES = {
 
 // Image paths resolve to F1's 2026 portrait assets. The assets remain hosted
 // by Formula 1 and are loaded only when a driver card enters the page.
-const driver = (name, surname, number, nationality, teamKey, profileSlug, assetPath) => ({
+const driver = (name, surname, number, nationality, teamKey, assetPath) => ({
   name,
   surname,
   number,
   nationality,
   teamKey,
-  profileUrl: `https://www.formula1.com/en/drivers/${profileSlug}`,
   portraitUrl: `${F1_MEDIA}/ar_1%3A1%2Cc_crop%2Cg_north%2Cw_420/b_rgb%3A${TEAM_STYLES[teamKey].assetColor}/common/f1/2026/${assetPath}`,
 });
 
 export const DRIVER_PROFILES = {
-  COL: driver("Franco Colapinto", "Colapinto", 43, "Argentina", "alpine", "franco-colapinto", "alpine/fracol01/2026alpinefracol01front.png"),
-  GAS: driver("Pierre Gasly", "Gasly", 10, "France", "alpine", "pierre-gasly", "alpine/piegas01/2026alpinepiegas01front.png"),
-  ALO: driver("Fernando Alonso", "Alonso", 14, "Spain", "aston", "fernando-alonso", "astonmartin/feralo01/2026astonmartinferalo01front.png"),
-  STR: driver("Lance Stroll", "Stroll", 18, "Canada", "aston", "lance-stroll", "astonmartin/lanstr01/2026astonmartinlanstr01front.png"),
-  BOR: driver("Gabriel Bortoleto", "Bortoleto", 5, "Brazil", "audi", "gabriel-bortoleto", "audi/gabbor01/2026audigabbor01front.png"),
-  HUL: driver("Nico Hulkenberg", "Hulkenberg", 27, "Germany", "audi", "nico-hulkenberg", "audi/nichul01/2026audinichul01front.png"),
-  PER: driver("Sergio Perez", "Perez", 11, "Mexico", "cadillac", "sergio-perez", "cadillac/serper01/2026cadillacserper01front.png"),
-  BOT: driver("Valtteri Bottas", "Bottas", 77, "Finland", "cadillac", "valtteri-bottas", "cadillac/valbot01/2026cadillacvalbot01front.png"),
-  LEC: driver("Charles Leclerc", "Leclerc", 16, "Monaco", "ferrari", "charles-leclerc", "ferrari/chalec01/2026ferrarichalec01front.png"),
-  HAM: driver("Lewis Hamilton", "Hamilton", 44, "United Kingdom", "ferrari", "lewis-hamilton", "ferrari/lewham01/2026ferrarilewham01front.png"),
-  OCO: driver("Esteban Ocon", "Ocon", 31, "France", "haas", "esteban-ocon", "haasf1team/estoco01/2026haasf1teamestoco01front.png"),
-  BEA: driver("Oliver Bearman", "Bearman", 87, "United Kingdom", "haas", "oliver-bearman", "haasf1team/olibea01/2026haasf1teamolibea01front.png"),
-  NOR: driver("Lando Norris", "Norris", 1, "United Kingdom", "mclaren", "lando-norris", "mclaren/lannor01/2026mclarenlannor01front.png"),
-  PIA: driver("Oscar Piastri", "Piastri", 81, "Australia", "mclaren", "oscar-piastri", "mclaren/oscpia01/2026mclarenoscpia01front.png"),
-  RUS: driver("George Russell", "Russell", 63, "United Kingdom", "mercedes", "george-russell", "mercedes/georus01/2026mercedesgeorus01front.png"),
-  ANT: driver("Kimi Antonelli", "Antonelli", 12, "Italy", "mercedes", "kimi-antonelli", "mercedes/andant01/2026mercedesandant01front.png"),
-  LIN: driver("Arvid Lindblad", "Lindblad", 41, "United Kingdom", "racingBulls", "arvid-lindblad", "racingbulls/arvlin01/2026racingbullsarvlin01front.png"),
-  LAW: driver("Liam Lawson", "Lawson", 30, "New Zealand", "racingBulls", "liam-lawson", "racingbulls/lialaw01/2026racingbullslialaw01front.png"),
-  HAD: driver("Isack Hadjar", "Hadjar", 6, "France", "redBull", "isack-hadjar", "redbullracing/isahad01/2026redbullracingisahad01front.png"),
-  VER: driver("Max Verstappen", "Verstappen", 3, "Netherlands", "redBull", "max-verstappen", "redbullracing/maxver01/2026redbullracingmaxver01front.png"),
-  ALB: driver("Alexander Albon", "Albon", 23, "Thailand", "williams", "alexander-albon", "williams/alealb01/2026williamsalealb01front.png"),
-  SAI: driver("Carlos Sainz", "Sainz", 55, "Spain", "williams", "carlos-sainz", "williams/carsai01/2026williamscarsai01front.png"),
+  COL: driver("Franco Colapinto", "Colapinto", 43, "Argentina", "alpine", "alpine/fracol01/2026alpinefracol01front.png"),
+  GAS: driver("Pierre Gasly", "Gasly", 10, "France", "alpine", "alpine/piegas01/2026alpinepiegas01front.png"),
+  ALO: driver("Fernando Alonso", "Alonso", 14, "Spain", "aston", "astonmartin/feralo01/2026astonmartinferalo01front.png"),
+  STR: driver("Lance Stroll", "Stroll", 18, "Canada", "aston", "astonmartin/lanstr01/2026astonmartinlanstr01front.png"),
+  BOR: driver("Gabriel Bortoleto", "Bortoleto", 5, "Brazil", "audi", "audi/gabbor01/2026audigabbor01front.png"),
+  HUL: driver("Nico Hulkenberg", "Hulkenberg", 27, "Germany", "audi", "audi/nichul01/2026audinichul01front.png"),
+  PER: driver("Sergio Perez", "Perez", 11, "Mexico", "cadillac", "cadillac/serper01/2026cadillacserper01front.png"),
+  BOT: driver("Valtteri Bottas", "Bottas", 77, "Finland", "cadillac", "cadillac/valbot01/2026cadillacvalbot01front.png"),
+  LEC: driver("Charles Leclerc", "Leclerc", 16, "Monaco", "ferrari", "ferrari/chalec01/2026ferrarichalec01front.png"),
+  HAM: driver("Lewis Hamilton", "Hamilton", 44, "United Kingdom", "ferrari", "ferrari/lewham01/2026ferrarilewham01front.png"),
+  OCO: driver("Esteban Ocon", "Ocon", 31, "France", "haas", "haasf1team/estoco01/2026haasf1teamestoco01front.png"),
+  BEA: driver("Oliver Bearman", "Bearman", 87, "United Kingdom", "haas", "haasf1team/olibea01/2026haasf1teamolibea01front.png"),
+  NOR: driver("Lando Norris", "Norris", 1, "United Kingdom", "mclaren", "mclaren/lannor01/2026mclarenlannor01front.png"),
+  PIA: driver("Oscar Piastri", "Piastri", 81, "Australia", "mclaren", "mclaren/oscpia01/2026mclarenoscpia01front.png"),
+  RUS: driver("George Russell", "Russell", 63, "United Kingdom", "mercedes", "mercedes/georus01/2026mercedesgeorus01front.png"),
+  ANT: driver("Kimi Antonelli", "Antonelli", 12, "Italy", "mercedes", "mercedes/andant01/2026mercedesandant01front.png"),
+  LIN: driver("Arvid Lindblad", "Lindblad", 41, "United Kingdom", "racingBulls", "racingbulls/arvlin01/2026racingbullsarvlin01front.png"),
+  LAW: driver("Liam Lawson", "Lawson", 30, "New Zealand", "racingBulls", "racingbulls/lialaw01/2026racingbullslialaw01front.png"),
+  HAD: driver("Isack Hadjar", "Hadjar", 6, "France", "redBull", "redbullracing/isahad01/2026redbullracingisahad01front.png"),
+  VER: driver("Max Verstappen", "Verstappen", 3, "Netherlands", "redBull", "redbullracing/maxver01/2026redbullracingmaxver01front.png"),
+  ALB: driver("Alexander Albon", "Albon", 23, "Thailand", "williams", "williams/alealb01/2026williamsalealb01front.png"),
+  SAI: driver("Carlos Sainz", "Sainz", 55, "Spain", "williams", "williams/carsai01/2026williamscarsai01front.png"),
 };
 
 export function getDriverProfile(code) {
@@ -74,7 +73,6 @@ export function getDriverProfile(code) {
     surname: key || "Unknown",
     number: null,
     nationality: null,
-    profileUrl: null,
     portraitUrl: null,
     teamKey: null,
   };

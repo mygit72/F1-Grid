@@ -2,7 +2,7 @@ import { useCountUp } from "../lib/useCountUp";
 import DriverPhoto from "./DriverPhoto";
 import { getDriverProfile, getTeamStyle } from "../lib/drivers";
 
-export default function Podium({ predictions, season }) {
+export default function Podium({ predictions, season, onSelectDriver }) {
   const top3 = [...predictions]
     .sort((a, b) => a.predicted_position - b.predicted_position)
     .slice(0, 3);
@@ -10,11 +10,11 @@ export default function Podium({ predictions, season }) {
 
   return (
     <section className="podium-wrap" aria-label="Predicted podium">
-      {winner && <TopPick prediction={winner} total={predictions.length} season={season} />}
+      {winner && <TopPick prediction={winner} total={predictions.length} season={season} onSelectDriver={onSelectDriver} />}
       {runners.length > 0 && (
         <div className="podium-runners">
           {runners.map((prediction, index) => (
-            <RunnerCard key={prediction.driver} prediction={prediction} season={season} delay={0.08 + index * 0.06} />
+            <RunnerCard key={prediction.driver} prediction={prediction} season={season} delay={0.08 + index * 0.06} onSelectDriver={onSelectDriver} />
           ))}
         </div>
       )}
@@ -22,7 +22,7 @@ export default function Podium({ predictions, season }) {
   );
 }
 
-function TopPick({ prediction, total, season }) {
+function TopPick({ prediction, total, season, onSelectDriver }) {
   const profile = getDriverProfile(prediction.driver);
   const team = getTeamStyle(prediction.team, prediction.driver);
   const pct = useCountUp((prediction.win_prob ?? 0) * 100, { decimals: 1 });
@@ -38,7 +38,7 @@ function TopPick({ prediction, total, season }) {
       <div className="top-pick__info">
         <div className="driver-teamline"><span className="livery-mark" /><span>{team.name}</span><span className="driver-nationality">{profile.nationality || "F1"}</span></div>
         <div className="top-pick__position">PREDICTED WINNER <span>01 / {String(total).padStart(2, "0")}</span></div>
-        <DriverName profile={profile} className="top-pick__name" />
+        <DriverName profile={profile} className="top-pick__name" onClick={() => onSelectDriver?.(prediction.driver)} />
         <div className="top-pick__metrics">
           <div className="top-pick__win">
             <span className="top-pick__score">{pct}<span className="top-pick__score-unit">%</span></span>
@@ -49,14 +49,14 @@ function TopPick({ prediction, total, season }) {
             <strong>{podiumPct}%</strong>
           </div>
         </div>
-        <div className="top-pick__photo-credit"><a href="https://www.formula1.com/en/drivers" target="_blank" rel="noreferrer">Official 2026 driver portrait ↗</a></div>
+        <div className="top-pick__photo-credit">2026 driver profile · Open in F1Grid</div>
       </div>
       <div className="top-pick__livery" aria-hidden="true" />
     </article>
   );
 }
 
-function RunnerCard({ prediction, season, delay }) {
+function RunnerCard({ prediction, season, delay, onSelectDriver }) {
   const profile = getDriverProfile(prediction.driver);
   const team = getTeamStyle(prediction.team, prediction.driver);
   const pct = useCountUp((prediction.win_prob ?? 0) * 100, { decimals: 1 });
@@ -66,7 +66,7 @@ function RunnerCard({ prediction, season, delay }) {
       <DriverPhoto code={prediction.driver} team={prediction.team} className="runner-card__portrait" />
       <div className="runner-card__content">
         <div className="runner-card__topline"><span className="runner-card__rank">P{prediction.predicted_position}</span><span className="runner-card__number">{season === 2026 && profile.number ? `#${profile.number}` : prediction.driver}</span></div>
-        <DriverName profile={profile} className="runner-card__name" />
+        <DriverName profile={profile} className="runner-card__name" onClick={() => onSelectDriver?.(prediction.driver)} />
         <div className="runner-card__team"><span className="livery-mark" />{team.name}</div>
         <div className="runner-card__prob"><span>WIN CHANCE</span><strong>{pct}%</strong></div>
       </div>
@@ -74,8 +74,6 @@ function RunnerCard({ prediction, season, delay }) {
   );
 }
 
-function DriverName({ profile, className }) {
-  const content = <span className={className}>{profile.name}</span>;
-  if (!profile.profileUrl) return content;
-  return <a className="driver-profile-link" href={profile.profileUrl} target="_blank" rel="noreferrer">{content}</a>;
+function DriverName({ profile, className, onClick }) {
+  return <button type="button" className="driver-profile-link" onClick={onClick}><span className={className}>{profile.name}</span></button>;
 }

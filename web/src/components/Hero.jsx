@@ -1,7 +1,6 @@
 import BackgroundFX from "./BackgroundFX";
-import { TEAM_STYLES } from "../lib/drivers";
 
-export default function Hero({ facts }) {
+export default function Hero({ facts, onOpenDrivers }) {
   const beats = facts?.beats2026;
   const stats = [
     { label: "Forecast release", value: "PRE-RACE" },
@@ -24,9 +23,9 @@ export default function Hero({ facts }) {
             <span className="brand-divider" />
             <span className="brand-descriptor">RACE INTELLIGENCE</span>
           </a>
-          <a className="grid-link" href="https://www.formula1.com/en/drivers" target="_blank" rel="noreferrer">
-            2026 DRIVER LINE-UP <span aria-hidden="true">↗</span>
-          </a>
+          <button className="grid-link" type="button" onClick={onOpenDrivers}>
+            2026 DRIVER LINE-UP <span aria-hidden="true">↓</span>
+          </button>
         </div>
 
         <div className="hero-layout" id="top">
@@ -46,16 +45,11 @@ export default function Hero({ facts }) {
             </dl>
           </div>
 
-          <div className="hero-visual" aria-label="2026 Formula 1 team colourway key">
+          <div className="hero-visual" aria-label="Stylized Ferrari SF-26 in red and white 2026 livery">
             <div className="hero-visual__orbit" aria-hidden="true" />
             <div className="hero-visual__car"><CarSVG /></div>
-            <div className="hero-visual__label"><span>2026 GRID</span><strong>11</strong><small>CONSTRUCTORS</small></div>
-            <div className="hero-livery-key">
-              {Object.values(TEAM_STYLES).filter((team) => team.name !== "Sauber").map((team) => (
-                <span key={team.name} title={team.name} style={{ "--team": team.accent, "--team-deep": team.deep }} />
-              ))}
-            </div>
-            <p className="hero-visual__caption">TEAM COLOURWAYS <span>2026</span></p>
+            <div className="hero-visual__label"><span>SCUDERIA</span><strong>16</strong><small>FERRARI · SF-26</small></div>
+            <p className="hero-visual__caption">ROSSO CORSA <span>2026 LIVERY</span></p>
           </div>
         </div>
       </div>
@@ -65,31 +59,54 @@ export default function Hero({ facts }) {
 
 function CarSVG() {
   return (
-    <svg viewBox="0 0 640 220" role="img" aria-label="Original abstract open-wheel race car illustration">
+    <svg viewBox="0 0 820 300" role="img" aria-label="Original Ferrari-red and white open-wheel race car illustration">
       <defs>
-        <linearGradient id="hero-car-body" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#56606d" />
-          <stop offset="0.55" stopColor="#d3d8dc" />
-          <stop offset="1" stopColor="#343b46" />
+        <linearGradient id="hero-car-red" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ff313c" />
+          <stop offset="0.42" stopColor="#e8002d" />
+          <stop offset="1" stopColor="#8e001c" />
         </linearGradient>
-        <linearGradient id="hero-car-glow" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#e21b34" stopOpacity="0" />
-          <stop offset="0.5" stopColor="#e21b34" stopOpacity="0.9" />
-          <stop offset="1" stopColor="#e21b34" stopOpacity="0" />
+        <linearGradient id="hero-car-white" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="1" stopColor="#cfd3d8" />
         </linearGradient>
-        <clipPath id="hero-car-clip">
-          <path d="M40 150 L120 150 A46 46 0 0 1 212 150 L360 150 A46 46 0 0 1 452 150 L560 150 L560 128 L470 120 L430 96 Q345 70 300 96 L245 118 L150 122 L110 128 Z" />
-        </clipPath>
       </defs>
-      <path d="M40 150 L120 150 A46 46 0 0 1 212 150 L360 150 A46 46 0 0 1 452 150 L560 150 L560 128 L470 120 L430 96 Q345 70 300 96 L245 118 L150 122 L110 128 Z" fill="url(#hero-car-body)" stroke="#cbd1d7" strokeOpacity=".6" strokeWidth="2" />
-      <path d="M30 140h28v18H30zM556 104h10v46h-10z" fill="#171c24" stroke="#d5dbe1" strokeOpacity=".6" strokeWidth="2" />
-      <path d="M120 132 L300 108 L470 124" fill="none" stroke="#e21b34" strokeWidth="5" />
-      <path d="M300 96 Q320 78 342 92" fill="none" stroke="#e21b34" strokeWidth="4" />
-      <g clipPath="url(#hero-car-clip)"><path d="M-40 180 L190 30" stroke="url(#hero-car-glow)" strokeWidth="20" /></g>
-      {[166, 406].map((cx) => (
+      <ellipse cx="423" cy="263" rx="355" ry="14" fill="#02060b" opacity=".44" />
+      <path d="M77 197 L148 193 L188 177 L267 162 L334 139 L369 108 L429 105 L463 139 L507 158 L588 174 L659 181 L737 190 L780 198 L772 210 L692 210 L664 203 L642 204 L535 201 L510 198 L342 198 L306 203 L224 207 L147 208 L111 202 L77 203 Z" fill="#111821" stroke="#66707c" strokeWidth="2" />
+      <path d="M66 188 L142 185 L190 168 L266 155 L324 132 L364 101 L427 97 L462 132 L510 151 L589 167 L663 175 L740 183 L781 191 L777 202 L692 202 L663 195 L642 197 L535 194 L510 191 L341 191 L303 197 L224 200 L145 201 L109 195 L66 196 Z" fill="url(#hero-car-red)" stroke="#ff6670" strokeOpacity=".72" strokeWidth="2" />
+
+      {/* 2026 Ferrari red-and-white bodywork, with black carbon aero surfaces. */}
+      <path d="M314 136 L359 104 L426 101 L458 135 L498 151 L470 159 L407 149 L356 149 Z" fill="url(#hero-car-white)" />
+      <path d="M256 157 L313 140 L353 151 L339 170 L271 177 L226 174 Z" fill="#f4f4f2" />
+      <path d="M488 158 L592 174 L663 181 L655 188 L570 184 L514 176 Z" fill="#f7f7f4" />
+      <path d="M151 185 L263 158 L283 161 L211 185 Z" fill="#ffb300" opacity=".95" />
+      <path d="M370 151 L437 151 L478 163 L551 176" fill="none" stroke="#9d001d" strokeWidth="5" opacity=".9" />
+      <path d="M329 171 L425 167 L485 174" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth="2" />
+
+      {/* Rear wing and front wing */}
+      <path d="M47 160 L55 142 L139 142 L144 151 L109 160 Z" fill="#151b23" stroke="#7b8490" strokeWidth="2" />
+      <path d="M48 142 L128 142 L136 150 L51 151 Z" fill="#e8002d" />
+      <path d="M745 180 L793 184 L800 197 L778 199 L749 195 Z" fill="#161d26" stroke="#8b939c" strokeWidth="2" />
+      <path d="M735 197 L800 198 L797 207 L738 206 Z" fill="#f6f7f8" />
+      <path d="M107 156 L95 194 M139 154 L149 195 M743 190 L730 203" stroke="#111821" strokeWidth="5" />
+
+      {/* Cockpit and halo */}
+      <path d="M366 112 Q386 82 417 93 L447 133 L430 145 L394 137 Z" fill="#090d12" stroke="#aab3bd" strokeWidth="2" />
+      <path d="M380 120 Q398 93 431 111 L447 135 M380 120 L423 126" fill="none" stroke="#d8dde2" strokeWidth="5" strokeLinecap="round" />
+      <path d="M404 94 L403 81 L409 79 L416 100" fill="#e8edf0" />
+
+      {/* Number roundel and small livery details */}
+      <circle cx="522" cy="169" r="18" fill="#ffd43b" stroke="#fff0a5" strokeWidth="2" />
+      <text x="522" y="175" fill="#a0001c" fontFamily="Arial, sans-serif" fontSize="18" fontWeight="800" textAnchor="middle">16</text>
+      <path d="M283 183 L305 181 M566 190 L614 192" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity=".8" />
+      <text x="450" y="185" fill="#fff" fontFamily="Arial, sans-serif" fontSize="8" fontWeight="700" letterSpacing="1.2">SCUDERIA</text>
+
+      {[215, 615].map((cx) => (
         <g key={cx}>
-          <circle cx={cx} cy="150" r="46" fill="#080b10" stroke="#555d68" strokeWidth="5" />
-          <circle cx={cx} cy="150" r="12" fill="#171c24" stroke="#aeb6bf" strokeWidth="3" />
+          <circle cx={cx} cy="205" r="50" fill="#070a0e" stroke="#343b45" strokeWidth="8" />
+          <circle cx={cx} cy="205" r="33" fill="#10161e" stroke="#59636f" strokeWidth="3" />
+          <circle cx={cx} cy="205" r="13" fill="#e8002d" stroke="#ffd43b" strokeWidth="3" />
+          <circle cx={cx} cy="205" r="4" fill="#f4f6f7" />
         </g>
       ))}
     </svg>
