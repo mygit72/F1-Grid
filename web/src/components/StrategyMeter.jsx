@@ -4,7 +4,7 @@
 // exactly what the API sends as a labelled Low/Medium/High gauge and makes NO
 // confidence claim. New venues arrive as state="no_history" and are shown as such.
 const LEVELS = ["Low", "Medium", "High"];
-const LEVEL_COLOR = { Low: "var(--muted)", Medium: "#d9a441", High: "#e0533d" };
+const LEVEL_COLOR = { Low: "var(--muted)", Medium: "var(--telemetry)", High: "var(--signal)" };
 
 export default function StrategyMeter({ meter }) {
   if (!meter) return null;

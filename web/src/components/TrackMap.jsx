@@ -44,7 +44,8 @@ export default function TrackMap({ predictions, highlightDriver }) {
   };
 
   return (
-    <div className="panel" style={{ padding: 16 }}>
+    <div className="panel on-dark" style={{ padding: 16 }}>
+      <div className="circuit-card-label">Circuit map</div>
       <svg viewBox="0 0 660 400" style={{ display: "block", width: "100%", height: "auto" }}>
         {/* engineering-tool backdrop: faint gridlines + axis ticks with mono labels */}
         <g aria-hidden="true">
@@ -94,7 +95,7 @@ export default function TrackMap({ predictions, highlightDriver }) {
                   transition={{ type: "spring", stiffness: 120, damping: 20 }}
                   r={isHi ? 9 : 6}
                   fill={teamColor(p.team)}
-                  stroke={isHi ? "var(--telemetry)" : "#05070a"}
+                  stroke={isHi ? "var(--telemetry)" : "#141414"}
                   strokeWidth={isHi ? 2.5 : 1.5}
                 />
                 {(i === 0 || isHi) && (

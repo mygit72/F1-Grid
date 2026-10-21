@@ -22,7 +22,8 @@ export default function StrategyGantt({ results, totalLaps }) {
   const lapTicks = [0, 0.25, 0.5, 0.75, 1].map((f) => Math.round(f * totalLaps));
 
   return (
-    <div className="panel glass" style={{ padding: 16 }}>
+    <div className="panel glass on-dark" style={{ padding: 16 }}>
+      <div className="circuit-card-label">Strategy comparison</div>
       {results.map((r, idx) => {
         let lapCursor = 0;
         return (
@@ -49,7 +50,7 @@ export default function StrategyGantt({ results, totalLaps }) {
                 borderRadius: 4,
                 overflow: "hidden",
                 background:
-                  "repeating-linear-gradient(90deg, var(--void) 0, var(--void) calc(25% - 1px), rgba(35,44,58,0.8) calc(25% - 1px), rgba(35,44,58,0.8) 25%)",
+                  "repeating-linear-gradient(90deg, var(--void) 0, var(--void) calc(25% - 1px), rgba(255,255,255,0.06) calc(25% - 1px), rgba(255,255,255,0.06) 25%)",
                 border: "1px solid var(--line)",
               }}
             >

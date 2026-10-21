@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { api } from "./lib/api";
 import { parseModelCardFacts } from "./lib/facts";
-import BackgroundFX from "./components/BackgroundFX";
 import Hero from "./components/Hero";
 import PredictionSkeleton from "./components/PredictionSkeleton";
 import StrategyMeter from "./components/StrategyMeter";
@@ -60,10 +59,9 @@ export default function App() {
 
   return (
     <>
-      <BackgroundFX />
+      <Hero facts={facts} />
+      <span className="checkered-strip" aria-hidden="true" />
       <div className="wrap">
-        <Hero facts={facts} />
-
         {serverStatus === "connecting" && slow && (
           <div className="banner banner-wake" data-testid="waking-banner">
             <span className="spin-dot" />
@@ -84,7 +82,7 @@ export default function App() {
           </div>
         )}
 
-        <nav style={{ display: "flex", gap: 8, margin: "22px 0 24px", flexWrap: "wrap" }}>
+        <nav className="nav-pills">
           {NAV.map((n) => (
             <button key={n.id} className="btn" aria-pressed={tab === n.id} onClick={() => setTab(n.id)}>
               {n.label}
@@ -95,6 +93,12 @@ export default function App() {
         {tab === "race" && <RaceView />}
         {tab === "manual" && <ManualGridView />}
         {tab === "strategy" && <StrategyView />}
+
+        <div className="disclaimer">
+          <span className="disclaimer__label">About this model</span>
+          Predictions come from a leakage-free, walk-forward statistical pipeline,
+          published before each race and graded afterward. Not betting advice.
+        </div>
       </div>
     </>
   );
@@ -135,21 +139,27 @@ function RaceView() {
 
   return (
     <div className="race-grid" style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 20 }}>
-      <div className="panel glass" style={{ padding: 16, alignSelf: "start" }}>
-        <div className="eyebrow" style={{ marginBottom: 10 }}>SELECT RACE</div>
+      <div className="panel lab-panel" style={{ alignSelf: "start" }}>
+        <div className="eyebrow" style={{ marginBottom: 14 }}>SELECT RACE</div>
         <Select label="Season" value={season} onChange={setSeason}
                 options={seasons.map((s) => ({ value: s, label: s }))} />
         <Select label="Grand Prix" value={round} onChange={setRound}
                 options={roundsForSeason.map((r) => ({ value: r.round, label: r.event }))} />
 
-        <div className="eyebrow" style={{ marginTop: 18, marginBottom: 8 }}>SCENARIO</div>
-        <label style={{ fontSize: "0.78rem", color: "var(--muted)" }}>Rain probability {rain}%</label>
-        <input type="range" min={0} max={100} step={5} value={rain}
-               aria-label="Rain probability percent"
-               onChange={(e) => setRain(Number(e.target.value))}
-               style={{ width: "100%", marginTop: 6 }} />
+        <div className="eyebrow" style={{ marginTop: 20, marginBottom: 12 }}>SCENARIO</div>
+        <div className="lab-field" style={{ marginBottom: 6 }}>
+          <div className="lab-slider-head">
+            <span className="lab-label" style={{ margin: 0 }}>Rain probability</span>
+            <span className="lab-slider-value">{rain}%</span>
+          </div>
+          <input type="range" min={0} max={100} step={5} value={rain}
+                 aria-label="Rain probability percent"
+                 onChange={(e) => setRain(Number(e.target.value))}
+                 className="lab-range" />
+          <div className="lab-range-labels"><span>Dry</span><span>Soaked</span></div>
+        </div>
 
-        <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14, fontSize: "0.8rem" }}>
+        <label className="lab-checkbox">
           <input type="checkbox" checked={useRealGrid} onChange={(e) => setUseRealGrid(e.target.checked)} />
           Use real grid (isolate race model)
         </label>
@@ -229,12 +239,16 @@ function StrategyView() {
 
   return (
     <div>
-      <div className="panel glass" style={{ padding: 16, marginBottom: 16, maxWidth: 400 }}>
-        <label style={{ fontSize: "0.78rem", color: "var(--muted)" }}>Rain probability {rain}%</label>
+      <div className="panel lab-panel" style={{ marginBottom: 16, maxWidth: 400 }}>
+        <div className="lab-slider-head">
+          <span className="lab-label" style={{ margin: 0 }}>Rain probability</span>
+          <span className="lab-slider-value">{rain}%</span>
+        </div>
         <input type="range" min={0} max={100} step={5} value={rain}
                aria-label="Rain probability percent"
                onChange={(e) => setRain(Number(e.target.value))}
-               style={{ width: "100%", marginTop: 6 }} />
+               className="lab-range" />
+        <div className="lab-range-labels"><span>Dry</span><span>Soaked</span></div>
       </div>
       {results ? (
         <Suspense fallback={<Fallback />}>
@@ -247,12 +261,11 @@ function StrategyView() {
 
 function Select({ label, value, onChange, options }) {
   return (
-    <div style={{ marginBottom: 10 }}>
-      <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: 4 }}>{label}</label>
+    <div className="lab-field">
+      <label className="lab-label">{label}</label>
       <select value={value ?? ""} aria-label={label}
         onChange={(e) => onChange(Number(e.target.value) || e.target.value)}
-        style={{ width: "100%", background: "var(--void)", border: "1px solid var(--line)",
-                 borderRadius: 6, color: "var(--text)", padding: "7px 8px", fontSize: "0.82rem" }}>
+        className="lab-select">
         {options.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
       </select>
     </div>

@@ -1,54 +1,56 @@
+import BackgroundFX from "./BackgroundFX";
+
 // Hero: an ORIGINAL abstract open-wheel car silhouette drawn as SVG (generic
 // shape, no team livery, no sponsor marks, no number, no real driver likeness),
-// with animated speed lines and a light sweep. All copy is factual and derived
+// shown as a faint watermark behind the copy. All copy is factual and derived
 // from real artifacts (see lib/facts.js): the process, the train/held-out split,
 // and the pre-qualifying baseline result.
 export default function Hero({ facts }) {
   const beats = facts?.beats2026;
-  const chips = [];
-  chips.push({ big: "PRE-RACE", small: "published before each race, graded after" });
+  const stats = [];
+  stats.push({ label: "published before each race, graded after", value: "PRE-RACE" });
   if (beats && beats.verdict === "YES") {
-    chips.push({
-      big: "BEATS",
-      small: `the pre-qualifying baseline, 2026 walk-forward (Spearman ${beats.pipeline} vs ${beats.baseline}, ${beats.races ?? 14} races)`,
+    stats.push({
+      label: `beats pre-qualifying baseline, 2026 walk-forward (${beats.races ?? 14} races)`,
+      value: "BEATS",
+      sub: `Spearman ${beats.pipeline} vs ${beats.baseline}`,
     });
   } else if (beats) {
-    chips.push({
-      big: `${beats.pipeline}`,
-      small: `pipeline Spearman vs ${beats.baseline} baseline, 2026 walk-forward (${beats.races ?? 14} races)`,
+    stats.push({
+      label: `pipeline Spearman vs ${beats.baseline} baseline, 2026 walk-forward (${beats.races ?? 14} races)`,
+      value: beats.pipeline,
     });
   }
-  chips.push({
-    big: facts?.trained || "2019 to 2024",
-    small: `trained, held out on ${facts?.heldOut || "2025"}`,
+  stats.push({
+    label: `trained, held out on ${facts?.heldOut || "2025"}`,
+    value: facts?.trained || "2019–2024",
   });
 
   return (
     <header className="hero">
-      <div className="eyebrow"><span className="dot" /> F1GRID / LIVE PREDICTION ENGINE</div>
+      <BackgroundFX />
+      <div className="hero-watermark" aria-hidden="true">
+        <CarSVG />
+      </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 20, alignItems: "center" }}
-           className="race-grid">
-        <div>
-          <h1 className="display-title" style={{ fontSize: "var(--step-4)" }}>
-            Race weekend,<br />predicted.
-          </h1>
-          <p style={{ color: "var(--muted)", maxWidth: 520, marginTop: 10, fontSize: "var(--step-0)" }}>
-            A leakage-free, walk-forward Formula 1 forecast. Every prediction is
-            published before the race and graded against the real result afterward.
-          </p>
-          <div className="stat-row">
-            {chips.map((c, i) => (
-              <span className="chip" key={i}>
-                <b>{c.big}</b> {c.small}
-              </span>
-            ))}
-          </div>
-        </div>
+      <div className="hero-inner">
+        <div className="eyebrow"><span className="dot" /> F1GRID / LIVE PREDICTION ENGINE</div>
 
-        <div className="hero-art" aria-hidden="true">
-          <CarSVG />
-        </div>
+        <h1 className="display-title">Race weekend,<br />predicted.</h1>
+
+        <p className="hero-subtitle">
+          A leakage-free, walk-forward Formula 1 forecast. Every prediction is
+          published before the race and graded against the real result afterward.
+        </p>
+
+        <dl className="hero-stats">
+          {stats.map((s, i) => (
+            <div className="hero-stat" key={i}>
+              <dt>{s.label}</dt>
+              <dd>{s.value}{s.sub ? <span style={{ display: "block", fontSize: "0.6em", fontWeight: 600, color: "rgba(247,245,242,0.55)", fontFamily: "var(--font-body)", marginTop: 2 }}>{s.sub}</span> : null}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </header>
   );
@@ -59,12 +61,12 @@ function CarSVG() {
     <svg viewBox="0 0 640 220" width="100%" height="100%" role="img" aria-label="Abstract open-wheel race car">
       <defs>
         <linearGradient id="body" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#161d29" />
-          <stop offset="1" stopColor="#0b1017" />
+          <stop offset="0" stopColor="#2a2a2a" />
+          <stop offset="1" stopColor="#111111" />
         </linearGradient>
         <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stopColor="transparent" />
-          <stop offset="0.5" stopColor="rgba(0,229,199,0.55)" />
+          <stop offset="0.5" stopColor="rgba(201,162,39,0.55)" />
           <stop offset="1" stopColor="transparent" />
         </linearGradient>
         <clipPath id="carclip">
@@ -87,8 +89,8 @@ function CarSVG() {
       {/* halo + cockpit accent */}
       <path d="M300 96 Q320 78 342 92" fill="none" stroke="var(--telemetry)" strokeWidth="3" opacity="0.9" />
       {/* front + rear wing */}
-      <rect x="30" y="140" width="26" height="18" rx="2" fill="#0b1017" stroke="var(--line)" strokeWidth="1.5" />
-      <rect x="556" y="104" width="10" height="46" rx="2" fill="#0b1017" stroke="var(--signal)" strokeWidth="1.5" />
+      <rect x="30" y="140" width="26" height="18" rx="2" fill="#111111" stroke="var(--line)" strokeWidth="1.5" />
+      <rect x="556" y="104" width="10" height="46" rx="2" fill="#111111" stroke="var(--signal)" strokeWidth="1.5" />
       {/* signal accent line along the body */}
       <path d="M120 132 L300 108 L470 124" fill="none" stroke="var(--signal)" strokeWidth="2.5" opacity="0.85" />
 
@@ -100,7 +102,7 @@ function CarSVG() {
       {/* wheels */}
       {[166, 406].map((cx) => (
         <g key={cx}>
-          <circle cx={cx} cy="150" r="46" fill="#0a0e14" stroke="var(--line)" strokeWidth="3" />
+          <circle cx={cx} cy="150" r="46" fill="#0a0a0a" stroke="var(--line)" strokeWidth="3" />
           <g className="wheel-spin" style={{ transformOrigin: `${cx}px 150px` }}>
             {[0, 60, 120].map((a) => (
               <line key={a} x1={cx} y1="120" x2={cx} y2="180"
@@ -108,7 +110,7 @@ function CarSVG() {
                     transform={`rotate(${a} ${cx} 150)`} />
             ))}
           </g>
-          <circle cx={cx} cy="150" r="10" fill="#0b1017" stroke="var(--telemetry)" strokeWidth="2" />
+          <circle cx={cx} cy="150" r="10" fill="#111111" stroke="var(--telemetry)" strokeWidth="2" />
         </g>
       ))}
     </svg>

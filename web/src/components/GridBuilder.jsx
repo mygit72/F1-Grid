@@ -28,7 +28,7 @@ export default function GridBuilder({ onPredict, loading }) {
   const removeRow = (i) => setRows(rows.filter((_, idx) => idx !== i));
 
   return (
-    <div className="panel" style={{ padding: 16 }}>
+    <div className="panel lab-panel" style={{ padding: 16 }}>
       <div className="eyebrow" style={{ marginBottom: 10 }}>
         <span className="dot" /> YOUR GRID
       </div>
@@ -68,15 +68,16 @@ export default function GridBuilder({ onPredict, loading }) {
         ))}
       </div>
 
-      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-        <button onClick={addRow} style={secondaryBtnStyle}>
+      <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+        <button onClick={addRow} className="lab-reset">
           + Add row
         </button>
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={() => onPredict(rows.filter((r) => r.driver))}
           disabled={loading}
-          style={primaryBtnStyle}
+          className="lab-run"
+          style={{ flex: 1 }}
         >
           {loading ? "Predicting…" : "Predict from this grid"}
         </motion.button>
@@ -87,12 +88,13 @@ export default function GridBuilder({ onPredict, loading }) {
 
 const inputStyle = (width) => ({
   width,
-  background: "var(--void)",
-  border: "1px solid var(--line)",
-  borderRadius: 4,
+  background: "#fff",
+  border: "1px solid rgba(20,18,14,0.2)",
+  borderRadius: 8,
   color: "var(--text)",
-  padding: "5px 8px",
-  fontFamily: "var(--font-mono)",
+  padding: "6px 8px",
+  fontFamily: "var(--font-body)",
+  fontWeight: 600,
   fontSize: "0.8rem",
 });
 
@@ -102,26 +104,4 @@ const removeBtnStyle = {
   color: "var(--muted)",
   cursor: "pointer",
   fontSize: "1rem",
-};
-
-const secondaryBtnStyle = {
-  background: "var(--panel-raised)",
-  border: "1px solid var(--line)",
-  color: "var(--text)",
-  borderRadius: 6,
-  padding: "8px 14px",
-  fontSize: "0.8rem",
-  cursor: "pointer",
-};
-
-const primaryBtnStyle = {
-  background: "var(--signal)",
-  border: "none",
-  color: "#05070A",
-  fontWeight: 700,
-  borderRadius: 6,
-  padding: "8px 16px",
-  fontSize: "0.8rem",
-  cursor: "pointer",
-  flex: 1,
 };
