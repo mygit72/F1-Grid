@@ -1,4 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
+import DriverPhoto from "./DriverPhoto";
+import { getDriverProfile, getTeamStyle } from "../lib/drivers";
 
 /**
  * Two columns, same row height: what you typed in (left) vs what the model
@@ -16,15 +18,13 @@ export default function GridComparison({ yourGrid, predictedFinish }) {
   };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-      <div>
-        <div className="eyebrow" style={{ marginBottom: 8 }}>YOUR GRID</div>
+    <div className="grid-comparison">
+      <div className="grid-comparison__column">
+        <div className="grid-comparison__heading"><div className="eyebrow">YOUR GRID</div><span>{yourGrid.length} DRIVERS</span></div>
         <Column rows={yourGrid.map((g) => ({ pos: g.position, driver: g.driver, team: g.team }))} />
       </div>
-      <div>
-        <div className="eyebrow" style={{ marginBottom: 8 }}>
-          <span className="dot" /> PREDICTED FINISH
-        </div>
+      <div className="grid-comparison__column">
+        <div className="grid-comparison__heading"><div className="eyebrow"><span className="dot" /> PREDICTED FINISH</div><span>{predictedFinish.length} DRIVERS</span></div>
         <Column
           rows={predictedFinish.map((p) => ({
             pos: p.predicted_position,
@@ -42,7 +42,7 @@ export default function GridComparison({ yourGrid, predictedFinish }) {
 
 function Column({ rows, showDelta }) {
   return (
-    <div className="panel" style={{ padding: 10 }}>
+    <div className="panel grid-comparison__list scrollbar-thin">
       <AnimatePresence initial={false}>
         {rows.map((r) => (
           <motion.div
@@ -51,21 +51,12 @@ function Column({ rows, showDelta }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ type: "spring", stiffness: 380, damping: 32 }}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "8px 10px",
-              marginBottom: 4,
-              borderRadius: 6,
-              background: "var(--panel-raised)",
-            }}
+            className="grid-comparison-row"
+            style={{ "--team": getTeamStyle(r.team, r.driver).accent, "--team-deep": getTeamStyle(r.team, r.driver).deep }}
           >
-            <span className="mono" style={{ width: 24, color: "var(--signal)", fontWeight: 700 }}>
-              {String(r.pos).padStart(2, "0")}
-            </span>
-            <span style={{ width: 56, fontWeight: 700 }}>{r.driver}</span>
-            <span style={{ flex: 1, color: "var(--muted)", fontSize: "0.78rem" }}>{r.team}</span>
+            <span className="grid-comparison-row__position">{String(r.pos).padStart(2, "0")}</span>
+            <DriverPhoto code={r.driver} team={r.team} className="grid-comparison-row__portrait" />
+            <span className="grid-comparison-row__driver"><strong>{getDriverProfile(r.driver).name}</strong><small>{getTeamStyle(r.team, r.driver).name}</small></span>
             {r.prior && (
               <span
                 title={r.prior}

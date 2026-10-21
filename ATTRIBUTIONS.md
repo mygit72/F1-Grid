@@ -1,9 +1,9 @@
 # Attributions and licences
 
-Every visual and audio element of the F1Grid frontend is either original work in
-this repository or an openly licensed dependency, with the licence recorded below.
-There are no real Formula 1 team liveries, logos, badges, driver likenesses,
-broadcast footage, team fonts, or circuit maps traced from official sources.
+Every locally created visual and audio element of the F1Grid frontend is original
+work in this repository or an openly licensed dependency. The 2026 driver portraits
+are remotely loaded from Formula 1's media CDN and remain Formula 1 property.
+F1Grid is an independent fan project and is not affiliated with Formula 1 or the FIA.
 
 ## Fonts (Google Fonts, loaded in web/index.html)
 
@@ -36,10 +36,24 @@ not any team's brand font.
   is labelled as such in the UI.
 - All motion (animated background grid and scan, speed lines, light sweep, boot
   telemetry lines, timing-tower streaks and pulses, count-up numbers) is built
-  from original CSS and SVG plus the MIT-licensed framer-motion library. No stock
-  media, video, image files, or audio are used anywhere.
-- Team accent colours in the timing tower and strategy chart are plain hex colour
-  values used as generic category accents, not reproductions of any brand asset.
+  from original CSS and SVG plus the MIT-licensed framer-motion library. No
+  stock footage or image files are bundled locally; remote portraits are listed
+  below.
+- Team colorways are plain color values used to identify each team's prediction
+  cards. They are not team logos or reproductions of car bodywork.
+
+## Formula 1 data and portraits
+
+- Current driver names, teams, portrait URLs, and profile links are based on the
+  [official 2026 driver directory](https://www.formula1.com/en/drivers). Race
+  numbers are based on the [official 2026 driver-number list](https://www.formula1.com/en/latest/article/all-the-2026-f1-driver-numbers-confirmed-in-full.5rh7o9mPntG7NerzVk9onc.5rh7o9mPntG7NerzVk9onc).
+- Portraits are served directly by `media.formula1.com`; the repository does not
+  contain copies of the image files. Driver profile cards link back to Formula 1.
+  Portraits and Formula 1 marks remain the property of Formula One World
+  Championship Limited and their respective owners.
+- Team color values correspond to the 2026 color key in the unofficial
+  [F1 2026 Assets index](https://turn1visuals.com/f1-2026-assets/). No team logo,
+  badge, or car photograph is bundled.
 
 ## Icons
 

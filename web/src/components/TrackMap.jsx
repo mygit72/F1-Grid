@@ -1,5 +1,6 @@
 import { useRef, useState, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
+import { getTeamStyle } from "../lib/drivers";
 
 // A generic, invented circuit outline - NOT a real F1 track's geometry. This
 // is deliberate: tracing an actual circuit (Silverstone, Monza, etc.) would
@@ -11,13 +12,6 @@ const TRACK_PATH =
   "C 460 215 480 150 540 150 C 600 150 620 200 600 240 " +
   "C 580 280 500 270 460 290 C 400 320 380 360 300 360 " +
   "C 180 360 60 320 60 220 Z";
-
-const TEAM_COLORS = {
-  RBR: "#3671C6", FER: "#F91536", MER: "#27F4D2", MCL: "#FF8000",
-  AST: "#229971", ALP: "#2293D1", WIL: "#37BEDD", HAA: "#B6BABD",
-  SAU: "#52E252", RB: "#6692FF",
-};
-const teamColor = (team) => TEAM_COLORS[team] ?? "#7C8794";
 
 /**
  * Renders driver dots spaced around a generic loop in finishing-order, with
@@ -94,7 +88,7 @@ export default function TrackMap({ predictions, highlightDriver }) {
                   animate={{ cx: point.x, cy: point.y }}
                   transition={{ type: "spring", stiffness: 120, damping: 20 }}
                   r={isHi ? 9 : 6}
-                  fill={teamColor(p.team)}
+                  fill={getTeamStyle(p.team, p.driver).accent}
                   stroke={isHi ? "var(--telemetry)" : "#141414"}
                   strokeWidth={isHi ? 2.5 : 1.5}
                 />
